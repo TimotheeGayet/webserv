@@ -2,11 +2,14 @@
 
 #pragma once
 
+#include <string>
+#include <iostream>
+
 class Config {
 
     public:
-        Config();
+        Config(const std::string &path);
         ~Config();
-        
+
     private:
-}
+};

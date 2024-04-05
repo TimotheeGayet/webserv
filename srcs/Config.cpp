@@ -1,3 +1,12 @@
 // Config.cpp
 
-#include "Config.hpp"
+#include "../includes/Config.hpp"
+
+Config::Config(const std::string &path) {
+    (void)path;
+    // Constructor
+}
+
+Config::~Config() {
+    // Destructor
+}
