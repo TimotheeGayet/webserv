@@ -1,4 +1,4 @@
-#include "./includes/Config.hpp"
+#include "./includes/config/Config.hpp"
 
 int main() {
     std::cout << "test" << std::endl;

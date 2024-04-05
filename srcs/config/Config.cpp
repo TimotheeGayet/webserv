@@ -1,6 +1,6 @@
 // Config.cpp
 
-#include "../includes/Config.hpp"
+#include "../../includes/config/Config.hpp"
 
 Config::Config(const std::string &path) {
     (void)path;
