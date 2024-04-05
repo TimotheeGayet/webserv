@@ -3,7 +3,10 @@
 #pragma once
 
 #include <map>
+#include <vector>
 #include <string>
+#include <fstream>
+#include <sstream>
 #include <iostream>
 #include "../../includes/config/Location.hpp"
 
@@ -15,8 +18,8 @@ class Config {
         ~Config();
 
     private:
-        int                         _port     ;             // port to map
-        Location*                   _locations;             // locations list
+        int                         _port;                  // port to map
+        std::vector<Location>       _locations;             // locations list
         std::string                 _server_name;           // server adress
         std::string                 _client_max_body_size;  // body size limitaion
         std::map<int, std::string>  _error_pages;           // map of error pages with their codes
