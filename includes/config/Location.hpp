@@ -5,11 +5,26 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <iostream>
+#include <sstream>
+#include <cstdlib>
 
 class Location {
     public:
         Location();
         ~Location();
+
+        void                        setPath(const std::string &value);
+        void                        setRoot(const std::string &value);
+        void                        setIndex(const std::string &value);
+        void                        setAutoindex(const std::string &value);
+        void                        setRedirectUrl(const std::string &value);
+        void                        setAllowedMethods(const std::string &value);
+        void                        setClientMaxBodySize(const std::string &value);
+        void                        setClientBodyTempPath(const std::string &value);
+        void                        setErrorPages(const std::map<int, std::string> &value);
+        void                        setLocationParam(const std::string &key, const std::string &value);
+        std::vector<std::string>    getAllowedMethods() const;
     
     private:
         bool                        _autoindex;             // repertories listing
@@ -22,3 +37,4 @@ class Location {
         std::vector<std::string>    _allowed_methods;       // allowed methods (GET, POST and/or DELETE)
         std::map<int, std::string>  _error_pages;           // map of error pages with their codes
 };
+

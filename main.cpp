@@ -1,6 +1,13 @@
 #include "./includes/config/Config.hpp"
 
 int main() {
-    std::cout << "test" << std::endl;
+
+    try {
+        Config config("./server.conf");
+    }
+    catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+    
     return 0;
 }
