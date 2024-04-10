@@ -1,15 +1,15 @@
 #include <string>
+#include "includes/Request.hpp"
+#include <iostream>
 
-std::string generateTestRequest() {
-    return "GET /index.html HTTP/1.1\r\n"
-           "Host: example.com\r\n"
-           "User-Agent: FakeClient/1.0\r\n"
-           "Accept: */*\r\n"
-           "\r\n";
+std::string generateTestRequest()
+{
+    return "GET https://www.boo.com/index.html HTTP/1.1\r\nHost: example.com\r User-Agent: FakeClient/1.0\r\nAccept: */*\r\n\r\n";
 }
 
-int main() {
+int main()
+{
     std::string request = generateTestRequest();
-    // send request to server
+    Request req(request);
     return 0;
 }
