@@ -2,75 +2,17 @@
 
 #include "../../includes/config/Config.hpp"
 
+// UTILS
 // ************************************************************************************************ //
 
 static bool is_whitespace(const char c) {
     return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
 }
 
-static bool isNumber(const std::string& str) {
-    if (str.empty()) {
-        return false;
-    }
-    for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
-        if (!std::isdigit(*it)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-static void clear_whitespace(std::string &str) {
-    size_t start = 0;
-    size_t end = str.size() - 1;
-    while (start < str.size() && is_whitespace(str[start])) {
-        start++;
-    }
-    while (end > 0 && is_whitespace(str[end])) {
-        end--;
-    }
-    str = str.substr(start, end - start + 1);
-}
-
-static std::map<int, std::string> get_error_pages(const std::string &value) {
-    std::map<int, std::string> errorPages;
-    std::istringstream iss(value);
-    std::string token;
-
-    while (iss >> token) {
-        size_t pos = token.find(':');
-        if (pos == std::string::npos) {
-            throw std::invalid_argument("Erreur: '" + token + "' n'est pas une page d'erreur valide.");
-        }
-        int code;
-        std::string str = token.substr(0, pos);
-        bool isNumber = true;
-        for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
-            if (!isdigit(*it)) {
-                isNumber = false;
-                break;
-            }
-        }
-        if (isNumber) {
-            code = std::atoi(str.c_str());
-        } else {
-            throw std::invalid_argument("Erreur: '" + str + "' n'est pas un code d'erreur valide.");
-        }
-        std::string page = token.substr(pos + 1);
-        errorPages[code] = page;
-    }
-    return errorPages;
-}
-
 // ************************************************************************************************ //
 
 Config::Config(const std::string &path)
-    : _port(0), 
-      _locations(std::vector<Location>()), 
-      _root(""), 
-      _server_name(""), 
-      _client_max_body_size("0"), 
-      _error_pages(std::map<int, std::string>()) 
+    : _servers()
 {
     std::ifstream file(path.c_str());
     if (!file.is_open()) {
@@ -78,27 +20,56 @@ Config::Config(const std::string &path)
     }
 
     std::string line;
-    std::string section;
+    std::string section("");
+    bool emptyField = false;
+    ServerConfig *currentServer = NULL;
 
-    while (std::getline(file, line)) {
+    while (std::getline(file, line) && !file.eof()) {
         if (line.empty() || line[0] == '#' || is_whitespace(line[0])) {
             continue;
         }
 
         if (line[0] == '[') {
+            if (emptyField) {
+                throw std::runtime_error("Erreur de configuration : section vide");
+            }
             section = parseSection(line);
+            if (section == "server") {
+                if (currentServer != NULL && !currentServer->isConfigured()) {
+                    throw std::runtime_error("Erreur de configuration : section 'server' sans configuration");
+                }
+                _servers.push_back(ServerConfig());
+                currentServer = &_servers.back();
+            }
+            emptyField = true;
             continue;
         }
 
         if (section == "server") {
-            parseServerConfig(line);
+            if (currentServer == NULL) {
+                throw std::runtime_error("Erreur de configuration : section 'server' avant la définition du serveur");
+            }
+            currentServer->parseServerConfig(line);
+            emptyField = false;
         } else if (section == "location") {
-            parseLocationConfig(file, line);
+            if (currentServer == NULL) {
+                throw std::runtime_error("Erreur de configuration : section 'location' avant la définition du serveur");
+            }
+            currentServer->parseLocations(file, line);
+            emptyField = false;
         } else {
             throw std::runtime_error("Section inconnue dans le fichier de configuration : " + section);
         }
     }
+
+    for (std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
+        if (!it->isConfigured()) {
+            throw std::runtime_error("Erreur de configuration : section 'server' sans configuration");
+        }
+    }
 }
+
+Config::~Config() {}
 
 std::string Config::parseSection(const std::string& line) {
     size_t endPos = line.find_last_of(']');
@@ -108,64 +79,53 @@ std::string Config::parseSection(const std::string& line) {
     return line.substr(1, endPos - 1);
 }
 
-void Config::parseServerConfig(const std::string& line) {
-    std::istringstream iss(line);
-    std::string key, value;
-    std::getline(iss, key, '=');
-    std::getline(iss, value);
-    clear_whitespace(key);
-    clear_whitespace(value);
-
-    if (key == "listen") {
-        if (isNumber(value)) {
-            _port = std::atoi(value.c_str());
-        }
-        else {
-            throw std::invalid_argument("Erreur: '" + value + "' n'est pas un nombre valide pour le port.");
-        }
-    }
-    else if (key == "root") {
-        _root = value;
-    }
-    else if (key == "server_name") {
-        _server_name = value;
-    }
-    else if (key == "client_max_body_size") {
-        _client_max_body_size = value;
-    }
-    else if (key == "error_pages") {
-        try {
-            _error_pages = get_error_pages(value);
-        }
-        catch (const std::exception& e) {
-            throw std::runtime_error("Erreur lors de la lecture des pages d'erreur : " + std::string(e.what()));
-        }
-    }
-    else {
-        throw std::runtime_error("Clé inconnue dans la configuration du serveur : " + key);
-    }
+std::vector<ServerConfig> Config::getServerConfigs() const {
+    return _servers;
 }
 
-void Config::parseLocationConfig(std::ifstream& file, const std::string& firstLine) {
-    Location location;
+void Config::printConfig() const {
 
-    std::string line = firstLine;
-    while (!line.empty() && line[0] != '[') {
-        if (!line.empty() && line[0] != '#' && !is_whitespace(line[0])) {
-            std::istringstream iss(line);
-            std::string key, value;
-            std::getline(iss, key, '=');
-            std::getline(iss, value);
-            clear_whitespace(key);
-            clear_whitespace(value);
-            location.setLocationParam(key, value);
+    std::cout << "Config:" << std::endl;
+    for (std::vector<ServerConfig>::const_iterator it = _servers.begin(); it != _servers.end(); ++it) {
+        std::cout << "Server config:" << std::endl;
+        std::cout << "  Port: " << it->getPort() << std::endl;
+        std::cout << "  Root: " << it->getRoot() << std::endl;
+        std::cout << "  Server name: " << it->getServerName() << std::endl;
+        std::cout << "  Client max body size: " << it->getClientMaxBodySize() << std::endl;
+        std::cout << "  Error pages:" << std::endl;
+        const std::map<int, std::string>& errorPages = it->getErrorPages();
+        for (std::map<int, std::string>::const_iterator it2 = errorPages.begin(); it2 != errorPages.end(); ++it2) {
+            std::cout << "    " << it2->first << ": " << it2->second << std::endl;
         }
-        if (!std::getline(file, line)) {
-            break;
+        std::cout << "  Locations:" << std::endl;
+        const std::vector<Location>& locations = it->getLocations();
+        for (std::vector<Location>::const_iterator it2 = locations.begin(); it2 != locations.end(); ++it2) {
+            std::cout << "    Location:" << std::endl;
+            std::cout << "      Autoindex: " << it2->getAutoindex() << std::endl;
+            std::cout << "      Path: " << it2->getPath() << std::endl;
+            std::cout << "      Root: " << it2->getRoot() << std::endl;
+            std::cout << "      Index: " << it2->getIndex() << std::endl;
+            std::cout << "      Redirect URL: " << it2->getRedirectUrl() << std::endl;
+            std::cout << "      Client body temp path: " << it2->getClientBodyTempPath() << std::endl;
+            std::cout << "      Client max body size: " << it2->getClientMaxBodySize() << std::endl;
+            std::cout << "      Allowed methods:" << std::endl;
+            size_t size = 0;
+            std::vector<std::string> allowedMethods = it2->getAllowedMethods();
+            size = allowedMethods.size();
+            for (size_t i = 0; i < size; i++) {
+                std::cout << "        " << allowedMethods[i];
+                if (i < size - 1) {
+                    std::cout << ", ";
+                }
+                else {
+                    std::cout << std::endl;
+                }
+            }
+            std::cout << "      Error pages:" << std::endl;
+            const std::map<int, std::string>& locationErrorPages = it2->getErrorPages();
+            for (std::map<int, std::string>::const_iterator it3 = locationErrorPages.begin(); it3 != locationErrorPages.end(); ++it3) {
+                std::cout << "        " << it3->first << ": " << it3->second << std::endl;
+            }
         }
     }
-
-    _locations.push_back(location);
 }
-
-Config::~Config() {}

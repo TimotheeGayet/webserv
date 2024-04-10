@@ -14,16 +14,26 @@ class Location {
         Location();
         ~Location();
 
-        void                        setPath(const std::string &value);
-        void                        setRoot(const std::string &value);
-        void                        setIndex(const std::string &value);
-        void                        setAutoindex(const std::string &value);
-        void                        setRedirectUrl(const std::string &value);
-        void                        setAllowedMethods(const std::string &value);
-        void                        setClientMaxBodySize(const std::string &value);
-        void                        setClientBodyTempPath(const std::string &value);
-        void                        setErrorPages(const std::map<int, std::string> &value);
-        void                        setLocationParam(const std::string &key, const std::string &value);
+        void                        setPath(const std::string value);
+        void                        setRoot(const std::string value);
+        void                        setIndex(const std::string value);
+        void                        setAutoindex(const std::string value);
+        void                        setRedirectUrl(const std::string value);
+        void                        setAllowedMethods(const std::string value);
+        void                        setClientMaxBodySize(const std::string value);
+        void                        setClientBodyTempPath(const std::string value);
+        void                        setErrorPages(const std::map<int, std::string> value);
+        void                        setLocationParam(const std::string key, const std::string value);
+        
+        bool                        getAutoindex() const;
+        bool                        isConfigured() const;
+        std::string                 getPath() const;
+        std::string                 getRoot() const;
+        std::string                 getIndex() const;
+        std::string                 getRedirectUrl() const;
+        std::string                 getClientMaxBodySize() const;
+        std::string                 getClientBodyTempPath() const;
+        std::map<int, std::string>  getErrorPages() const;
         std::vector<std::string>    getAllowedMethods() const;
     
     private:

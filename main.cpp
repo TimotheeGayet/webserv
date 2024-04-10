@@ -4,6 +4,8 @@ int main() {
 
     try {
         Config config("./server.conf");
+
+        config.printConfig();
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
