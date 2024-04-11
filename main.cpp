@@ -20,7 +20,7 @@ int main(int ac, char **av) {
             ports.push_back(it->getPort());
         }
 
-        config.printConfig();
+        // config.printConfig();
 
         std::cout << "\n\nStarting server...\n\n" << std::endl;
         Server serv(config, ports);

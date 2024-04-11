@@ -63,6 +63,14 @@ static std::map<int, std::string> get_error_pages(const std::string &value) {
     return errorPages;
 }
 
+static std::string parseSection(const std::string& line) {
+    size_t endPos = line.find_last_of(']');
+    if (endPos == std::string::npos) {
+        throw std::runtime_error("Bad format : " + line);
+    }
+    return line.substr(1, endPos - 1);
+}
+
 // ************************************************************************************************ //
 
 ServerConfig::ServerConfig()
@@ -114,9 +122,11 @@ void ServerConfig::parseServerConfig(const std::string& line) {
     }
 }
 
-void ServerConfig::parseLocations(std::ifstream& file, const std::string& firstLine) {
-    Location location;
+int ServerConfig::parseLocations(std::ifstream& file, const std::string& firstLine, std::string& section) {
+    Location    location;
+    int         value;
 
+    value = 0;
     std::string line = firstLine;
     while (!file.eof() && line[0] != '[') {
         if (!line.empty() && line[0] != '#' && !is_whitespace(line[0])) {
@@ -135,12 +145,19 @@ void ServerConfig::parseLocations(std::ifstream& file, const std::string& firstL
             break;
         }
     }
+    if (line[0] == '[') {
+        section = parseSection(line);
+        if (section == "server") {
+            value = 1;
+        }
+    }
     if (location.isConfigured()) {
         _locations.push_back(location);
     }
     else {
         throw std::runtime_error("Error: missing configuration in location block.");
     }
+    return value;
 }
 
 bool ServerConfig::isConfigured() const {

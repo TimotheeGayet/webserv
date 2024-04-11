@@ -14,9 +14,8 @@ class Config {
         Config(const Config &other);
         ~Config();
 
-        std::string                 parseSection(const std::string &line);
-        std::vector<ServerConfig>   getServerConfigs() const;
         void                        printConfig() const;
+        std::vector<ServerConfig>   getServerConfigs() const;
 
     private:
         std::vector<ServerConfig> _servers;

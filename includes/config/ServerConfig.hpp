@@ -19,7 +19,7 @@ class ServerConfig {
         ~ServerConfig();
 
         void                        parseServerConfig(const std::string &line);
-        void                        parseLocations(std::ifstream& file, const std::string& firstLine);
+        int                         parseLocations(std::ifstream& file, const std::string& firstLine, std::string& section);
         bool                        isConfigured() const;
 
         u_int16_t                    getPort() const;

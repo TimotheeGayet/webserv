@@ -9,6 +9,14 @@ static bool is_whitespace(const char c) {
     return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
 }
 
+static std::string parseSection(const std::string& line) {
+    size_t endPos = line.find_last_of(']');
+    if (endPos == std::string::npos) {
+        throw std::runtime_error("Bad format : " + line);
+    }
+    return line.substr(1, endPos - 1);
+}
+
 // ************************************************************************************************ //
 
 Config::Config() {}
@@ -63,13 +71,24 @@ Config::Config(const std::string &path)
             }
             currentServer->parseServerConfig(line);
             emptyField = false;
-        } else if (section == "location") {
+        }
+        else if (section == "location") {
             if (currentServer == NULL) {
                 throw std::runtime_error("Configuration error : 'location' section before server definition");
             }
-            currentServer->parseLocations(file, line);
-            emptyField = false;
-        } else {
+            if (currentServer->parseLocations(file, line, section) == 1) {
+                if (currentServer != NULL && !currentServer->isConfigured()) {
+                    throw std::runtime_error("Configuration error : 'server' section without configuration");
+                }
+                _servers.push_back(ServerConfig());
+                currentServer = &_servers.back();
+                emptyField = true;
+            }
+            else {
+                emptyField = false;
+            }
+        }
+        else {
             throw std::runtime_error("Unkown section in config file : " + section);
         }
     }
@@ -82,14 +101,6 @@ Config::Config(const std::string &path)
 }
 
 Config::~Config() {}
-
-std::string Config::parseSection(const std::string& line) {
-    size_t endPos = line.find_last_of(']');
-    if (endPos == std::string::npos) {
-        throw std::runtime_error("Bad format : " + line);
-    }
-    return line.substr(1, endPos - 1);
-}
 
 std::vector<ServerConfig> Config::getServerConfigs() const {
     return _servers;
