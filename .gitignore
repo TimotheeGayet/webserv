@@ -1,3 +1,6 @@
 .vscode
 build
 webserv
+a.out
+ServerSave.cpp
+**/a.out
