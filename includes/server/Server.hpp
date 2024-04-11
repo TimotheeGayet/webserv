@@ -27,6 +27,15 @@ class Server {
 
         int                     run();
 
+        class ExitSignal : public std::exception {
+            public:
+                const char* what() const throw() { return " signal received!"; }
+        };
+        class ExitError : public std::exception {
+            public:
+                const char* what() const throw() { return " error received!"; }
+        };
+
     private:
         SocketInfo initializeSocket(u_int16_t port);
 

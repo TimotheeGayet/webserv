@@ -24,7 +24,9 @@ int main(int ac, char **av) {
 
         std::cout << "\n\nStarting server...\n\n" << std::endl;
         Server serv(config, ports);
-        serv.run();
+        if (serv.run() == 0) {
+            std::cout << "Server stopped. Exiting..." << std::endl;
+        }
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
