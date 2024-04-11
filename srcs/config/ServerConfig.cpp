@@ -41,7 +41,7 @@ static std::map<int, std::string> get_error_pages(const std::string &value) {
     while (iss >> token) {
         size_t pos = token.find(':');
         if (pos == std::string::npos) {
-            throw std::invalid_argument("Erreur: '" + token + "' n'est pas une page d'erreur valide.");
+            throw std::invalid_argument("Error: '" + token + "'is not a valid Error page.");
         }
         int code;
         std::string str = token.substr(0, pos);
@@ -55,7 +55,7 @@ static std::map<int, std::string> get_error_pages(const std::string &value) {
         if (isNumber) {
             code = std::atoi(str.c_str());
         } else {
-            throw std::invalid_argument("Erreur: '" + str + "' n'est pas un code d'erreur valide.");
+            throw std::invalid_argument("Error: '" + str + "' is not a valid Error code.");
         }
         std::string page = token.substr(pos + 1);
         errorPages[code] = page;
@@ -89,7 +89,7 @@ void ServerConfig::parseServerConfig(const std::string& line) {
             _port = static_cast<u_int16_t>(std::atoi(value.c_str()));
         }
         else {
-            throw std::invalid_argument("Erreur: '" + value + "' n'est pas un nombre valide pour le port.");
+            throw std::invalid_argument("Error: '" + value + "' is not a valid port number.");
         }
     }
     else if (key == "root") {
@@ -106,11 +106,11 @@ void ServerConfig::parseServerConfig(const std::string& line) {
             _error_pages = get_error_pages(value);
         }
         catch (const std::exception& e) {
-            throw std::runtime_error("Erreur lors de la lecture des pages d'erreur : " + std::string(e.what()));
+            throw std::runtime_error("Error while reading error pages : " + std::string(e.what()));
         }
     }
     else {
-        throw std::runtime_error("Clé inconnue dans la configuration du serveur : " + key);
+        throw std::runtime_error("Unknown key in server configuration : " + key);
     }
 }
 
@@ -139,7 +139,7 @@ void ServerConfig::parseLocations(std::ifstream& file, const std::string& firstL
         _locations.push_back(location);
     }
     else {
-        throw std::runtime_error("Erreur de configuration : location avec configuration manquante");
+        throw std::runtime_error("Error: missing configuration in location block.");
     }
 }
 

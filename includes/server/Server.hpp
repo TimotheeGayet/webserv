@@ -25,11 +25,11 @@ class Server {
         Server(Config conf, std::vector<u_int16_t> ports);
         ~Server();
 
-        int     run();
+        int                     run();
 
     private:
         SocketInfo initializeSocket(u_int16_t port);
 
-        Config                   _config;
-        std::vector<u_int16_t>   _ports;
+        Config                  _config;
+        std::vector<u_int16_t>  _ports;
 };

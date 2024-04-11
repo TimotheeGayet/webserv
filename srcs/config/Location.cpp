@@ -13,7 +13,7 @@ static std::map<int, std::string> get_error_pages(const std::string &value) {
     while (iss >> token) {
         size_t pos = token.find(':');
         if (pos == std::string::npos) {
-            throw std::invalid_argument("Erreur: '" + token + "' n'est pas une page d'erreur valide.");
+            throw std::invalid_argument("Error: '" + token + "'is not a valid Error page.");
         }
         int code;
         std::string str = token.substr(0, pos);
@@ -27,7 +27,7 @@ static std::map<int, std::string> get_error_pages(const std::string &value) {
         if (isNumber) {
             code = std::atoi(str.c_str());
         } else {
-            throw std::invalid_argument("Erreur: '" + str + "' n'est pas un code d'erreur valide.");
+            throw std::invalid_argument("Error: '" + str + "' is not a valid Error code.");
         }
         std::string page = token.substr(pos + 1);
         errorPages[code] = page;
@@ -80,11 +80,11 @@ void    Location::setLocationParam(const std::string key, const std::string valu
             this->setErrorPages(get_error_pages(value));
         }
         catch (const std::exception& e) {
-            throw std::runtime_error("Erreur lors de la lecture des pages d'erreur : " + std::string(e.what()));
+            throw std::runtime_error("Error while reading error pages : " + std::string(e.what()));
         }
     }
     else {
-        throw std::runtime_error("Clé inconnue dans la configuration d'une location : " + key);
+        throw std::runtime_error("Unknown key in location : " + key);
     }
 }
 
@@ -94,7 +94,7 @@ void Location::setAutoindex(const std::string value) {
     } else if (value == "off") {
         _autoindex = false;
     } else {
-        throw std::invalid_argument("Erreur: '" + value + "' n'est pas une valeur valide pour autoindex. Les valeurs valides sont 'on' et 'off'.");
+        throw std::invalid_argument("Error: '" + value + "' is not a valid value (must be on / off).");
     }
 }
 
@@ -130,7 +130,7 @@ void Location::setAllowedMethods(const std::string value) {
             _allowed_methods.push_back(method);
         }
         else {
-            throw std::invalid_argument("Erreur: '" + method + "' n'est pas une méthode autorisée. Les méthodes autorisées sont 'POST', 'GET' et 'DELETE'.");
+            throw std::invalid_argument("Error: '" + method + "' is not an allowed method (GET, POST, DELETE).");
         }
     }
 }

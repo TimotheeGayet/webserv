@@ -28,7 +28,7 @@ Config::Config(const std::string &path)
 {
     std::ifstream file(path.c_str());
     if (!file.is_open()) {
-        throw std::runtime_error("Impossible d'ouvrir le fichier de configuration : " + path);
+        throw std::runtime_error("Cannot open the config file : " + path);
     }
 
     std::string line;
@@ -43,12 +43,12 @@ Config::Config(const std::string &path)
 
         if (line[0] == '[') {
             if (emptyField) {
-                throw std::runtime_error("Erreur de configuration : section vide");
+                throw std::runtime_error("Configuration error : empty section");
             }
             section = parseSection(line);
             if (section == "server") {
                 if (currentServer != NULL && !currentServer->isConfigured()) {
-                    throw std::runtime_error("Erreur de configuration : section 'server' sans configuration");
+                    throw std::runtime_error("Configuration error : 'server' section without configuration");
                 }
                 _servers.push_back(ServerConfig());
                 currentServer = &_servers.back();
@@ -59,24 +59,24 @@ Config::Config(const std::string &path)
 
         if (section == "server") {
             if (currentServer == NULL) {
-                throw std::runtime_error("Erreur de configuration : section 'server' avant la définition du serveur");
+                throw std::runtime_error("Configuration error : 'server' section before server definition");
             }
             currentServer->parseServerConfig(line);
             emptyField = false;
         } else if (section == "location") {
             if (currentServer == NULL) {
-                throw std::runtime_error("Erreur de configuration : section 'location' avant la définition du serveur");
+                throw std::runtime_error("Configuration error : 'location' section before server definition");
             }
             currentServer->parseLocations(file, line);
             emptyField = false;
         } else {
-            throw std::runtime_error("Section inconnue dans le fichier de configuration : " + section);
+            throw std::runtime_error("Unkown section in config file : " + section);
         }
     }
 
     for (std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
         if (!it->isConfigured()) {
-            throw std::runtime_error("Erreur de configuration : section 'server' sans configuration");
+            throw std::runtime_error("Configuration error : 'server' section without configuration");
         }
     }
 }
@@ -86,7 +86,7 @@ Config::~Config() {}
 std::string Config::parseSection(const std::string& line) {
     size_t endPos = line.find_last_of(']');
     if (endPos == std::string::npos) {
-        throw std::runtime_error("Balise de section mal formée : " + line);
+        throw std::runtime_error("Bad format : " + line);
     }
     return line.substr(1, endPos - 1);
 }
