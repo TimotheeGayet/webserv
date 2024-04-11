@@ -8,9 +8,9 @@ FLAGS := -Wall -Wextra -Werror -std=c++98
 
 OBJDIR := build/
 
-SRCS := main.cpp ./srcs/config/Config.cpp ./srcs/config/ServerConfig.cpp ./srcs/config/Location.cpp ./srcs/server/Server.cpp ./srcs/Globals.cpp
+SRCS := main.cpp ./srcs/config/Config.cpp ./srcs/config/ServerConfig.cpp ./srcs/config/Location.cpp ./srcs/server/Server.cpp ./srcs/Globals.cpp ./srcs/utils.cpp
 
-HEADERS := $(HEADER)/config/Config.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/server/Server.hpp $(HEADER)/Globals.hpp
+HEADERS := $(HEADER)/config/Config.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/server/Server.hpp $(HEADER)/Globals.hpp $(HEADER)/utils.hpp
 
 OBJS := $(addprefix $(OBJDIR),$(SRCS:.cpp=.o))
 

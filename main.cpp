@@ -1,14 +1,17 @@
 #include "./includes/config/Config.hpp"
 #include "./includes/server/Server.hpp"
+#include "./includes/utils.hpp"
 #include "./includes/Globals.hpp"
 
 int main(int ac, char **av) {
-
     if (ac != 2) {
         std::cerr << "Usage: " << av[0] << " <config_file>" << std::endl;
         return 1;
     }
 
+    signal(SIGINT, handle_signal);
+    signal(SIGTERM, handle_signal);
+    signal(SIGQUIT, SIG_IGN);
     std::string path(av[1]);
 
     try {
@@ -25,6 +28,7 @@ int main(int ac, char **av) {
         std::cout << "\n\nStarting server...\n\n" << std::endl;
         Server serv(config, ports);
 
+        is_running = true;
         if (serv.run() == 0) {
             std::cout << "Server stopped. Exiting..." << std::endl;
         }

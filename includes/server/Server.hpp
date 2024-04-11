@@ -25,8 +25,6 @@ class Server {
         Server(Config conf, std::vector<u_int16_t> ports);
         ~Server();
 
-        int                     run();
-
         class ExitSignal : public std::exception {
             public:
                 const char* what() const throw() { return " signal received!"; }
@@ -35,6 +33,8 @@ class Server {
             public:
                 const char* what() const throw() { return " error received!"; }
         };
+        
+        int                     run();
 
     private:
         SocketInfo initializeSocket(u_int16_t port);

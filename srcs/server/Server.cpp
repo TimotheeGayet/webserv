@@ -2,22 +2,10 @@
 
 #include "../../includes/server/Server.hpp"
 #include "../../includes/Globals.hpp"
+#include "../../includes/utils.hpp"
 
 // UTILS
 // ************************************************************************************************ //
-
-static void cleanup() {
-    close(epoll_fd);
-    for (std::vector<SocketInfo>::iterator it = sockets.begin(); it != sockets.end(); ++it) {
-        close(it->socket_fd);
-    }
-}
-
-static void handle_signal(int signal) {
-    (void)signal;
-    cleanup();
-    throw Server::ExitSignal();
-}
 
 static void handleHttpRequest(int client_fd, const std::string& request) {
     std::istringstream iss(request);
@@ -94,9 +82,6 @@ SocketInfo Server::initializeSocket(u_int16_t port) {
 }
 
 int Server::run() {
-    signal(SIGINT, handle_signal);
-    signal(SIGTERM, handle_signal);
-
     epoll_fd = epoll_create(1);
     if (epoll_fd == -1) {
         std::cerr << "error: epoll_create" << std::endl;
