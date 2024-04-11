@@ -14,7 +14,7 @@ static void handleHttpRequest(int client_fd, const std::string& request) {
     std::istringstream issFirstLine(firstLine);
     std::string method, path, http_version;
     issFirstLine >> method >> path >> http_version;
-    std::cout << "send by client : " << request << std::endl;
+    std::cout << "send by client : \n" << request << std::endl;
     std::cout << "Requête pour : " << path << std::endl;
     std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nTIMOTE A TOI DE JOUER! TIMOTE ATTAQUE ECLAIR! CELA ECHOUE...\r\n";
     send(client_fd, response.c_str(), response.size(), 0);
