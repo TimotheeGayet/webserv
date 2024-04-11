@@ -153,6 +153,7 @@ int Server::run() {
                 // Add the client socket to the epoll instance
                 struct epoll_event event;
                 event.events = EPOLLIN; // listen input events
+                event.data.fd = client_fd;
                 if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &event) == -1) {
                     std::cerr << "error: epoll_ctl EPOLL_CTL_ADD" << std::endl;
                     cleanup();
