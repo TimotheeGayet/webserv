@@ -8,9 +8,9 @@ FLAGS := -Wall -Wextra -Werror -std=c++98
 
 OBJDIR := build/
 
-SRCS := main.cpp ./srcs/config/Config.cpp ./srcs/config/ServerConfig.cpp ./srcs/config/Location.cpp
+SRCS := main.cpp ./srcs/config/Config.cpp ./srcs/config/ServerConfig.cpp ./srcs/config/Location.cpp ./srcs/server/Server.cpp ./srcs/Globals.cpp
 
-HEADERS := $(HEADER)/config/Config.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp
+HEADERS := $(HEADER)/config/Config.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/server/Server.hpp $(HEADER)/Globals.hpp
 
 OBJS := $(addprefix $(OBJDIR),$(SRCS:.cpp=.o))
 
@@ -28,6 +28,7 @@ $(OBJDIR)%.o : %.cpp $(HEADERS) Makefile
 $(OBJDIR):
 	@echo "\033[1;97mwebserv: \033[0;33mMaking build directories ...\033[0;m"
 	mkdir -p $(OBJDIR)srcs/config
+	mkdir -p $(OBJDIR)srcs/server
 	@echo "\033[1;97mwebserv: \033[1;32mbuild directory done.\n\033[0;m"
 
 begin:

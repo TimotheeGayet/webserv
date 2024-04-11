@@ -11,6 +11,18 @@ static bool is_whitespace(const char c) {
 
 // ************************************************************************************************ //
 
+Config::Config() {}
+
+Config::Config(const Config &other)
+    : _servers(other._servers) {}
+
+Config &Config::operator=(const Config &other) {
+    if (this != &other) {
+        _servers = other._servers;
+    }
+    return *this;
+}
+
 Config::Config(const std::string &path)
     : _servers()
 {

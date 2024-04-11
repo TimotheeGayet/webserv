@@ -86,7 +86,7 @@ void ServerConfig::parseServerConfig(const std::string& line) {
 
     if (key == "listen") {
         if (isNumber(value)) {
-            _port = std::atoi(value.c_str());
+            _port = static_cast<u_int16_t>(std::atoi(value.c_str()));
         }
         else {
             throw std::invalid_argument("Erreur: '" + value + "' n'est pas un nombre valide pour le port.");
@@ -152,7 +152,7 @@ bool ServerConfig::isConfigured() const {
     }
 }
 
-int ServerConfig::getPort() const {
+u_int16_t ServerConfig::getPort() const {
     return _port;
 }
 

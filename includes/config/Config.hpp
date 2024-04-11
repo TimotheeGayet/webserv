@@ -8,7 +8,10 @@
 
 class Config {
     public:
+        Config();
         Config(const std::string &path);
+        Config(const Config &other);
+        Config &operator=(const Config &other);
         ~Config();
 
         std::string                 parseSection(const std::string &line);
