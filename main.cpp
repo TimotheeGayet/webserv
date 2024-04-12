@@ -3,6 +3,7 @@
 #include "./includes/Globals.hpp"
 #include "./includes/utils.hpp"
 
+
 int main(int ac, char **av) {
     if (ac != 2) {
         std::cerr << "Usage: " << av[0] << " <GlobalConfig_file>" << std::endl;
@@ -13,6 +14,8 @@ int main(int ac, char **av) {
     signal(SIGTERM, handle_signal);
     signal(SIGQUIT, SIG_IGN);
     std::string path(av[1]);
+
+    std::cout << illustration << std::endl;
 
     try {
         GlobalConfig config(path);
