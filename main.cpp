@@ -1,11 +1,11 @@
-#include "./includes/config/Config.hpp"
+#include "./includes/config/GlobalConfig.hpp"
 #include "./includes/server/Server.hpp"
-#include "./includes/utils.hpp"
 #include "./includes/Globals.hpp"
+#include "./includes/utils.hpp"
 
 int main(int ac, char **av) {
     if (ac != 2) {
-        std::cerr << "Usage: " << av[0] << " <config_file>" << std::endl;
+        std::cerr << "Usage: " << av[0] << " <GlobalConfig_file>" << std::endl;
         return 1;
     }
 
@@ -15,15 +15,15 @@ int main(int ac, char **av) {
     std::string path(av[1]);
 
     try {
-        Config config(path);
-        std::vector<ServerConfig> serverConfigs = config.getServerConfigs();
+        GlobalConfig config(path);
+        std::vector<ServerConfig> ServerConfigs = config.getServerConfigs();
         std::vector<u_int16_t> ports;
 
-        for (std::vector<ServerConfig>::iterator it = serverConfigs.begin(); it != serverConfigs.end(); ++it) {
+        for (std::vector<ServerConfig>::iterator it = ServerConfigs.begin(); it != ServerConfigs.end(); ++it) {
             ports.push_back(it->getPort());
         }
 
-        // config.printConfig();
+        // config.printGlobalConfig();
 
         std::cout << "\n\nStarting server...\n\n" << std::endl;
         Server serv(config, ports);

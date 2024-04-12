@@ -118,7 +118,7 @@ void ServerConfig::parseServerConfig(const std::string& line) {
         }
     }
     else {
-        throw std::runtime_error("Unknown key in server configuration : " + key);
+        throw std::runtime_error("Unknown key in server GlobalConfiguration : " + key);
     }
 }
 
@@ -151,16 +151,16 @@ int ServerConfig::parseLocations(std::ifstream& file, const std::string& firstLi
             value = 1;
         }
     }
-    if (location.isConfigured()) {
+    if (location.isGlobalConfigured()) {
         _locations.push_back(location);
     }
     else {
-        throw std::runtime_error("Error: missing configuration in location block.");
+        throw std::runtime_error("Error: missing GlobalConfiguration in location block.");
     }
     return value;
 }
 
-bool ServerConfig::isConfigured() const {
+bool ServerConfig::isGlobalConfigured() const {
     if (_port != 0 && !_server_name.empty() && !_locations.empty()) {
         return true;
     }

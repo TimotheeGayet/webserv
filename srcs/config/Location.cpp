@@ -139,7 +139,7 @@ void Location::setErrorPages(const std::map<int, std::string> value) {
     _error_pages = value;
 }
 
-bool Location::isConfigured() const {
+bool Location::isGlobalConfigured() const {
     if (!_root.empty() && !_path.empty()) {
         return true;
     }

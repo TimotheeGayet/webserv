@@ -22,8 +22,8 @@ static void handleHttpRequest(int client_fd, const std::string& request) {
 
 // ************************************************************************************************ //
 
-Server::Server(Config conf, std::vector<u_int16_t> ports)
-    : _config(conf),
+Server::Server(GlobalConfig conf, std::vector<u_int16_t> ports)
+    : _GlobalConfig(conf),
       _ports(ports)
       
 {

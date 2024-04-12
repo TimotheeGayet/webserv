@@ -13,7 +13,7 @@
 #include <sys/epoll.h>
 #include <signal.h>
 #include <cstdlib>
-#include "../config/Config.hpp"
+#include "../config/GlobalConfig.hpp"
 
 struct SocketInfo {
     int socket_fd;
@@ -22,16 +22,16 @@ struct SocketInfo {
 
 class Server {
     public:
-        Server(Config conf, std::vector<u_int16_t> ports);
+        Server(GlobalConfig conf, std::vector<u_int16_t> ports);
         ~Server();
 
         class ExitSignal : public std::exception {
             public:
-                const char* what() const throw() { return " signal received!"; }
+                const char* what() const throw() { return "signal received!"; }
         };
         class ExitError : public std::exception {
             public:
-                const char* what() const throw() { return " error received!"; }
+                const char* what() const throw() { return "error exit..."; }
         };
         
         int                     run();
@@ -39,6 +39,6 @@ class Server {
     private:
         SocketInfo initializeSocket(u_int16_t port);
 
-        Config                  _config;
+        GlobalConfig                  _GlobalConfig;
         std::vector<u_int16_t>  _ports;
 };

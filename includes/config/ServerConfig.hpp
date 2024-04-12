@@ -20,7 +20,7 @@ class ServerConfig {
 
         void                        parseServerConfig(const std::string &line);
         int                         parseLocations(std::ifstream& file, const std::string& firstLine, std::string& section);
-        bool                        isConfigured() const;
+        bool                        isGlobalConfigured() const;
 
         u_int16_t                    getPort() const;
         std::vector<Location>       getLocations() const;

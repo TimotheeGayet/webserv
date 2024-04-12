@@ -1,6 +1,6 @@
-// Config.cpp
+// GlobalConfig.cpp
 
-#include "../../includes/config/Config.hpp"
+#include "../../includes/config/GlobalConfig.hpp"
 
 // UTILS
 // ************************************************************************************************ //
@@ -19,24 +19,24 @@ static std::string parseSection(const std::string& line) {
 
 // ************************************************************************************************ //
 
-Config::Config() {}
+GlobalConfig::GlobalConfig() {}
 
-Config::Config(const Config &other)
+GlobalConfig::GlobalConfig(const GlobalConfig &other)
     : _servers(other._servers) {}
 
-Config &Config::operator=(const Config &other) {
+GlobalConfig &GlobalConfig::operator=(const GlobalConfig &other) {
     if (this != &other) {
         _servers = other._servers;
     }
     return *this;
 }
 
-Config::Config(const std::string &path)
+GlobalConfig::GlobalConfig(const std::string &path)
     : _servers()
 {
     std::ifstream file(path.c_str());
     if (!file.is_open()) {
-        throw std::runtime_error("Cannot open the config file : " + path);
+        throw std::runtime_error("Cannot open the GlobalConfig file : " + path);
     }
 
     std::string line;
@@ -51,12 +51,12 @@ Config::Config(const std::string &path)
 
         if (line[0] == '[') {
             if (emptyField) {
-                throw std::runtime_error("Configuration error : empty section");
+                throw std::runtime_error("GlobalConfiguration error : empty section");
             }
             section = parseSection(line);
             if (section == "server") {
-                if (currentServer != NULL && !currentServer->isConfigured()) {
-                    throw std::runtime_error("Configuration error : 'server' section without configuration");
+                if (currentServer != NULL && !currentServer->isGlobalConfigured()) {
+                    throw std::runtime_error("GlobalConfiguration error : 'server' section without GlobalConfiguration");
                 }
                 _servers.push_back(ServerConfig());
                 currentServer = &_servers.back();
@@ -67,18 +67,18 @@ Config::Config(const std::string &path)
 
         if (section == "server") {
             if (currentServer == NULL) {
-                throw std::runtime_error("Configuration error : 'server' section before server definition");
+                throw std::runtime_error("GlobalConfiguration error : 'server' section before server definition");
             }
             currentServer->parseServerConfig(line);
             emptyField = false;
         }
         else if (section == "location") {
             if (currentServer == NULL) {
-                throw std::runtime_error("Configuration error : 'location' section before server definition");
+                throw std::runtime_error("GlobalConfiguration error : 'location' section before server definition");
             }
             if (currentServer->parseLocations(file, line, section) == 1) {
-                if (currentServer != NULL && !currentServer->isConfigured()) {
-                    throw std::runtime_error("Configuration error : 'server' section without configuration");
+                if (currentServer != NULL && !currentServer->isGlobalConfigured()) {
+                    throw std::runtime_error("GlobalConfiguration error : 'server' section without GlobalConfiguration");
                 }
                 _servers.push_back(ServerConfig());
                 currentServer = &_servers.back();
@@ -89,28 +89,28 @@ Config::Config(const std::string &path)
             }
         }
         else {
-            throw std::runtime_error("Unkown section in config file : " + section);
+            throw std::runtime_error("Unkown section in GlobalConfig file : " + section);
         }
     }
 
     for (std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
-        if (!it->isConfigured()) {
-            throw std::runtime_error("Configuration error : 'server' section without configuration");
+        if (!it->isGlobalConfigured()) {
+            throw std::runtime_error("GlobalConfiguration error : 'server' section without GlobalConfiguration");
         }
     }
 }
 
-Config::~Config() {}
+GlobalConfig::~GlobalConfig() {}
 
-std::vector<ServerConfig> Config::getServerConfigs() const {
+std::vector<ServerConfig> GlobalConfig::getServerConfigs() const {
     return _servers;
 }
 
-void Config::printConfig() const {
+void GlobalConfig::printGlobalConfig() const {
 
-    std::cout << "Config:" << std::endl;
+    std::cout << "GlobalConfig:" << std::endl;
     for (std::vector<ServerConfig>::const_iterator it = _servers.begin(); it != _servers.end(); ++it) {
-        std::cout << "Server config:" << std::endl;
+        std::cout << "Server GlobalConfig:" << std::endl;
         std::cout << "  Port: " << it->getPort() << std::endl;
         std::cout << "  Root: " << it->getRoot() << std::endl;
         std::cout << "  Server name: " << it->getServerName() << std::endl;

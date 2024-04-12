@@ -26,7 +26,7 @@ class Location {
         void                        setLocationParam(const std::string key, const std::string value);
         
         bool                        getAutoindex() const;
-        bool                        isConfigured() const;
+        bool                        isGlobalConfigured() const;
         std::string                 getPath() const;
         std::string                 getRoot() const;
         std::string                 getIndex() const;
