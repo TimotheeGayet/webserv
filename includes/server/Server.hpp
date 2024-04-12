@@ -27,11 +27,11 @@ class Server {
 
         class ExitSignal : public std::exception {
             public:
-                const char* what() const throw() { return "signal received!"; }
+                const char* what() const throw() { return " signal received!"; }
         };
         class ExitError : public std::exception {
             public:
-                const char* what() const throw() { return "error exit..."; }
+                const char* what() const throw() { return "exit caused by an error..."; }
         };
         
         int                     run();
