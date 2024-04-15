@@ -1,25 +1,45 @@
-CXX = c++
-CXXFLAGS = -std=c++98 -Wall -Wextra -Werror
+NAME := webserv
 
-TARGET = handleRequest
+HEADER := ./includes
 
-SRCS = main.cpp srcs/Request.cpp
+CPP := c++
 
-OBJS = $(SRCS:%.cpp=.obj/%.o)
+FLAGS := -Wall -Wextra -Werror -std=c++98
 
-$(TARGET) : $(OBJS)
-	$(CXX) $(OBJS) -o $@
+OBJDIR := build/
 
-.obj/%.o : %.cpp Makefile includes/Request.hpp
-	@if [ ! -d .obj ]; then mkdir -p .obj; fi
-	@if [ ! -d $(@D) ]; then mkdir -p $(@D); fi
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+SRCS := main.cpp ./srcs/config/GlobalConfig.cpp ./srcs/config/ServerConfig.cpp ./srcs/config/Location.cpp ./srcs/server/Server.cpp ./srcs/Globals.cpp ./srcs/utils.cpp ./srcs/Request.cpp 
 
-.PHONY : clean fclean re
-clean :
-	rm -rf .obj
+HEADERS := $(HEADER)/config/GlobalConfig.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/server/Server.hpp $(HEADER)/Globals.hpp $(HEADER)/utils.hpp $(HEADER)/Request.hpp
 
-fclean : clean
-	rm -rf $(TARGET)
+OBJS := $(addprefix $(OBJDIR),$(SRCS:.cpp=.o))
 
-re : fclean $(TARGET)
+all: begin $(NAME)
+	@echo "\033[1;97mwebserv: \033[1;32mwebserv DONE\033[0;m"
+
+$(NAME): $(OBJDIR) $(OBJS)
+	@echo "\033[1;97m\nwebserv: \033[0;33mCompiling webserv...\033[0;m"
+	$(CPP) $(OBJS) -I$(HEADER) -o $(NAME)
+
+$(OBJDIR)%.o : %.cpp $(HEADERS) Makefile
+	@echo "\033[1;97mwebserv: \033[0;3mBuilding $< into $@\033[0;m"
+	$(CPP) $(FLAGS) -I$(HEADER) -c $< -o $@
+
+$(OBJDIR):
+	@echo "\033[1;97mwebserv: \033[0;33mMaking build directories ...\033[0;m"
+	mkdir -p $(OBJDIR)srcs/config
+	mkdir -p $(OBJDIR)srcs/server
+	@echo "\033[1;97mwebserv: \033[1;32mbuild directory done.\n\033[0;m"
+
+begin:
+	@echo "\033[1;97mwebserv: \033[1;32mMaking webserv ...\n\033[0;m"
+
+clean:
+	rm -rf $(OBJDIR)
+
+fclean: clean
+	rm -f $(NAME)
+
+re: fclean all
+
+.PHONY: all clean fclean
