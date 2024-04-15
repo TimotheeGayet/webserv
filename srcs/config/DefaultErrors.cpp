@@ -1,6 +1,6 @@
 // DefaultErrors.cpp
 
-#include "../../includes/server/DefaultErrors.hpp"
+#include "../../includes/config/DefaultErrors.hpp"
 
 DefaultErrors::DefaultErrors():
     _400("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>400 Bad Request</title></head><body><h1>400 Bad Request</h1><p>Your browser sent a request that this server could not understand.</p></body></html>"),

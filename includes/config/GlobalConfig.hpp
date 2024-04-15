@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include "./ServerConfig.hpp"
-#include "../server/DefaultErrors.hpp"
+#include "./DefaultErrors.hpp"
 
 class GlobalConfig {
     public:
