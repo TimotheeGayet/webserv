@@ -5,7 +5,7 @@
 #include "../../includes/utils.hpp"
 #include "../../includes/Request.hpp"
 
-// **************e********************************************************************************** //
+// ************************************************************************************************ //
 
 Server::Server(GlobalConfig conf, std::vector<u_int16_t> ports)
     : _GlobalConfig(conf),
@@ -135,7 +135,7 @@ int Server::run() {
                     char buffer[1024];
                     int bytes_received = recv(fd, buffer, sizeof(buffer), 0);
                     if (bytes_received <= 0) {
-                        // no data received -> client disconnected
+                        // no data received -> client disconnected or error
                         if (bytes_received == 0) {
                             std::cout << "Client disconnected" << std::endl;
                         } else {
@@ -146,10 +146,20 @@ int Server::run() {
                     } else {
                         // data received -> handle the HTTP request
                         std::string request(buffer, bytes_received);
+                    
                         Request req(fd, request);
+                        req.Answer();
+                        std::string response = req.getResponse();
 
-                        close(fd);
-                        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+                        int bytes_sent = send(fd, response.c_str(), response.size(), 0);
+                        if (bytes_sent != static_cast<int>(response.size())) {
+                            std::cerr << "error: send" << std::endl;
+                            close(fd);
+                            epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+                        } else {
+                            close(fd);
+                            epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+                        }
                     }
                 }
             }

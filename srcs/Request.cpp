@@ -1,10 +1,11 @@
-#include "../includes/Request.hpp"
+a#include "../includes/Request.hpp"
+#include "../includes/Globals.hpp"
 #include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string>
 
-Request::Request(size_t client_fd, const std::string& msg) : _req(msg), _method("GET"), _uri("http://localhost:80"), _host("localhost"), _port(80), _path(""), _query(""), _fragment(""), _version("1.1"), _body("")
+Request::Request(size_t client_fd, const std::string& msg) : _req(msg), _method("GET"), _uri(""), _path(""), _query(""), _fragment(""), _version("1.1"), _body("")
 {
 	(void)client_fd;
 
@@ -39,8 +40,8 @@ Request::Request(size_t client_fd, const std::string& msg) : _req(msg), _method(
 		isValidURI();
 		if (this->_version != "HTTP/1.1\r")
 			throw std::runtime_error("Invalid version: " + this->_version);
-		// Add the parameter parsing
-		// Add the body parsing
+		paramsParsing();
+		bodyParsing();
 	}
 	catch (std::exception &e)
 	{
@@ -67,6 +68,7 @@ void Request::isValidURI()
 		this->_uri.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%") != std::string::npos)
 		throw std::runtime_error("Invalid URI: " + this->_uri);
 
+	// Scheme parsing
 	if (this->_uri.substr(index, 5) == "http:")
 		index = 5;
 

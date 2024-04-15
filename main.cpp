@@ -19,6 +19,7 @@ int main(int ac, char **av) {
 
     try {
         GlobalConfig config(path);
+        g_config = config;
         std::vector<ServerConfig> ServerConfigs = config.getServerConfigs();
         std::vector<u_int16_t> ports;
 

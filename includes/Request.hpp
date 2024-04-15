@@ -15,6 +15,7 @@ private:
 	std::string _fragment;
 	std::string _version;
 	std::string _body;
+	std::map<std::string, std::string> _headers;
 
 	void isValidURI();
 
@@ -24,4 +25,7 @@ public:
 	~Request();
 
 	void Answer();
+	std::string getResponse();
+	void headerParsing();
+	void bodyParsing();
 };
