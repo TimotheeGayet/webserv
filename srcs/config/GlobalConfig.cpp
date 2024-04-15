@@ -106,6 +106,10 @@ std::vector<ServerConfig> GlobalConfig::getServerConfigs() const {
     return _servers;
 }
 
+DefaultErrors GlobalConfig::getDefaultErrors() const {
+    return _defaultErrors;
+}
+
 void GlobalConfig::printGlobalConfig() const {
 
     std::cout << "GlobalConfig:" << std::endl;

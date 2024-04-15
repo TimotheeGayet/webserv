@@ -4,7 +4,8 @@
 
 #include <vector>
 #include <string>
-#include "../../includes/config/ServerConfig.hpp"
+#include "./ServerConfig.hpp"
+#include "../server/DefaultErrors.hpp"
 
 class GlobalConfig {
     public:
@@ -16,7 +17,9 @@ class GlobalConfig {
 
         void                        printGlobalConfig() const;
         std::vector<ServerConfig>   getServerConfigs() const;
+        DefaultErrors               getDefaultErrors() const;
 
     private:
-        std::vector<ServerConfig> _servers;
+        std::vector<ServerConfig>   _servers;
+        DefaultErrors               _defaultErrors;
 };

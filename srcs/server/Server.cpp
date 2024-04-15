@@ -7,7 +7,7 @@
 // UTILS
 // ************************************************************************************************ //
 
-static void handleHttpRequest(int client_fd, const std::string& request) {
+static std::string handleHttpRequest(const std::string& request) {
     std::istringstream iss(request);
     std::string firstLine;
     std::getline(iss, firstLine);
@@ -17,7 +17,7 @@ static void handleHttpRequest(int client_fd, const std::string& request) {
     std::cout << "send by client : \n" << request << std::endl;
     std::cout << "Requête pour : " << path << std::endl;
     std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nTIMOTE A TOI DE JOUER! TIMOTE ATTAQUE ECLAIR! CELA ECHOUE...\r\n";
-    send(client_fd, response.c_str(), response.size(), 0);
+    return response;
 }
 
 // ************************************************************************************************ //
@@ -150,7 +150,7 @@ int Server::run() {
                     char buffer[1024];
                     int bytes_received = recv(fd, buffer, sizeof(buffer), 0);
                     if (bytes_received <= 0) {
-                        // no data received -> client disconnected
+                        // no data received -> client disconnected or error
                         if (bytes_received == 0) {
                             std::cout << "Client disconnected" << std::endl;
                         } else {
@@ -161,10 +161,18 @@ int Server::run() {
                     } else {
                         // data received -> handle the HTTP request
                         std::string request(buffer, bytes_received);
-                        handleHttpRequest(fd, request);
+                    
+                        std::string response = handleHttpRequest(request);
 
-                        close(fd);
-                        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+                        int bytes_sent = send(fd, response.c_str(), response.size(), 0);
+                        if (bytes_sent != static_cast<int>(response.size())) {
+                            std::cerr << "error: send" << std::endl;
+                            close(fd);
+                            epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+                        } else {
+                            close(fd);
+                            epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+                        }
                     }
                 }
             }
