@@ -145,9 +145,12 @@ int Server::run() {
                         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
                     } else {
                         // data received -> handle the HTTP request
+
+                        std::cout << "Received: " << std::string(buffer, bytes_received) << std::endl;
+
                         std::string request(buffer, bytes_received);
                     
-                        Request req(fd, request);
+                        Request req(request);
                         req.Answer();
                         std::string response = req.getResponse();
 

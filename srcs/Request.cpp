@@ -1,13 +1,12 @@
-a#include "../includes/Request.hpp"
+#include "../includes/Request.hpp"
 #include "../includes/Globals.hpp"
 #include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string>
 
-Request::Request(size_t client_fd, const std::string& msg) : _req(msg), _method("GET"), _uri(""), _path(""), _query(""), _fragment(""), _version("1.1"), _body("")
+Request::Request(const std::string& msg) : _return_code(200), _req(msg), _method(""), _uri(""), _host(""), _port(80), _path(""), _query(""), _fragment(""), _version(""), _body(""), _headers(), _content_length(0), _transfer_encoding("")
 {
-	(void)client_fd;
 
 	std::cout << "Request: " << msg << std::endl;
 
@@ -30,17 +29,15 @@ Request::Request(size_t client_fd, const std::string& msg) : _req(msg), _method(
 				this->_version = item;
 		}
 
-		if (count != 3)
+		if (count != 3 || \
+			this->_version != "HTTP/1.1\r" || \
+			line.substr(line.length() - 1) != "\r" || \
+			(this->_method != "GET" && this->_method != "POST" && this->_method != "DELETE")){
+			this->_return_code = 400;
 			throw std::runtime_error("Invalid request line: " + line);
-		if (line.substr(line.length() - 1) != "\r")
-			throw std::runtime_error("Header line does not end with \\r\\n : " + line);
-
-		if (this->_method != "GET" && this->_method != "POST" && this->_method != "DELETE")
-			throw std::runtime_error("Invalid method: " + this->_method);
+		}
 		isValidURI();
-		if (this->_version != "HTTP/1.1\r")
-			throw std::runtime_error("Invalid version: " + this->_version);
-		paramsParsing();
+		headerParsing();
 		bodyParsing();
 	}
 	catch (std::exception &e)
@@ -61,12 +58,13 @@ void Request::Answer()
 
 void Request::isValidURI()
 {
-	std::string authority;
 	std::size_t index = 0;
 
 	if (this->_uri.empty() ||
-		this->_uri.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%") != std::string::npos)
-		throw std::runtime_error("Invalid URI: " + this->_uri);
+		this->_uri.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%") != std::string::npos){
+			this->_return_code = 400;
+			throw std::runtime_error("Invalid URI: " + this->_uri);
+		}
 
 	// Scheme parsing
 	if (this->_uri.substr(index, 5) == "http:")
@@ -79,13 +77,15 @@ void Request::isValidURI()
 		std::size_t authorityEnd = this->_uri.find_first_of("/?#", authorityStart + 2);
 		if (authorityEnd == std::string::npos)
 			authorityEnd = this->_uri.length();
-		authority = this->_uri.substr(authorityStart + 2, authorityEnd - authorityStart - 2);
-		std::size_t portStart = authority.find(':');
-		if (portStart != std::string::npos && portStart != authority.length() - 1)
+		this->_host = this->_uri.substr(authorityStart + 2, authorityEnd - authorityStart - 2);
+		std::size_t portStart = this->_host.find(':');
+		if (portStart != std::string::npos && portStart != this->_host.length() - 1)
 		{
-			std::string port = authority.substr(portStart + 1);
-			if (port.find_first_not_of("0123456789") != std::string::npos)
+			std::string port = this->_host.substr(portStart + 1);
+			if (port.find_first_not_of("0123456789") != std::string::npos){
+				this->_return_code = 400;
 				throw std::runtime_error("Invalid port: " + this->_uri);
+			}
 			this->_port = std::strtod(port.c_str(), NULL);
 		}
 		index = authorityEnd;
