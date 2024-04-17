@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <map>
 
 class Request
 {
@@ -21,7 +22,7 @@ private:
 
 public:
 	// Constructors
-	Request(size_t client_fd, const std::string& msg); // We will need to replace msg by the config file object as a parameter
+	Request(size_t client_fd, const std::string &msg); // We will need to replace msg by the config file object as a parameter
 	~Request();
 
 	void Answer();
