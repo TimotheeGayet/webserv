@@ -22,7 +22,7 @@ class ServerConfig {
         int                         parseLocations(std::ifstream& file, const std::string& firstLine, std::string& section);
         bool                        isGlobalConfigured() const;
 
-        u_int16_t                    getPort() const;
+        u_int16_t                   getPort() const;
         std::vector<Location>       getLocations() const;
         std::string                 getRoot() const;
         std::string                 getServerName() const;
@@ -30,7 +30,7 @@ class ServerConfig {
         std::map<int, std::string>  getErrorPages() const;
     
     private:
-        u_int16_t                    _port;                  // port to map
+        u_int16_t                   _port;                  // port to map
         std::vector<Location>       _locations;             // locations list
         std::string                 _root;                  // path of the folder to route
         std::string                 _server_name;           // server adress

@@ -8,9 +8,17 @@ FLAGS := -Wall -Wextra -Werror -std=c++98
 
 OBJDIR := build/
 
-SRCS := main.cpp ./srcs/config/GlobalConfig.cpp ./srcs/config/ServerConfig.cpp ./srcs/config/Location.cpp ./srcs/server/Server.cpp ./srcs/config/DefaultErrors.cpp ./srcs/Globals.cpp ./srcs/utils.cpp
+SRCS := main.cpp \
+	./srcs/config/GlobalConfig.cpp ./srcs/config/ServerConfig.cpp ./srcs/config/Location.cpp ./srcs/config/DefaultErrors.cpp \
+	./srcs/server/Server.cpp \
+	./srcs/cgi/CgiHandler.cpp \
+	./srcs/Globals.cpp ./srcs/utils.cpp
 
-HEADERS := $(HEADER)/config/GlobalConfig.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/server/Server.hpp $(HEADER)/config/DefaultErrors.hpp $(HEADER)/Globals.hpp $(HEADER)/utils.hpp
+HEADERS := \
+	$(HEADER)/config/GlobalConfig.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/config/DefaultErrors.hpp \
+	$(HEADER)/server/Server.hpp \
+	$(HEADER)/cgi/CgiHandler.hpp \
+	$(HEADER)/Globals.hpp $(HEADER)/utils.hpp
 
 OBJS := $(addprefix $(OBJDIR),$(SRCS:.cpp=.o))
 
@@ -29,6 +37,7 @@ $(OBJDIR):
 	@echo "\033[1;97mwebserv: \033[0;33mMaking build directories ...\033[0;m"
 	mkdir -p $(OBJDIR)srcs/config
 	mkdir -p $(OBJDIR)srcs/server
+	mkdir -p $(OBJDIR)srcs/cgi
 	@echo "\033[1;97mwebserv: \033[1;32mbuild directory done.\n\033[0;m"
 
 begin:
