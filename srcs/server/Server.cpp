@@ -3,7 +3,7 @@
 #include "../../includes/server/Server.hpp"
 #include "../../includes/Globals.hpp"
 #include "../../includes/utils.hpp"
-#include "../../includes/Request.hpp"
+#include "../../includes/request/Request.hpp"
 
 // ************************************************************************************************ //
 
@@ -151,7 +151,6 @@ int Server::run() {
                         std::string request(buffer, bytes_received);
                     
                         Request req(request);
-                        req.Answer();
                         std::string response = req.getResponse();
 
                         int bytes_sent = send(fd, response.c_str(), response.size(), 0);

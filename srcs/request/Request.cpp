@@ -1,15 +1,8 @@
-#include "../includes/Request.hpp"
-#include "../includes/Globals.hpp"
-#include <algorithm>
-#include <iostream>
-#include <sstream>
-#include <string>
+#include "../../includes/request/Request.hpp"
+#include "../../includes/Globals.hpp"
 
-Request::Request(const std::string& msg) : _return_code(200), _req(msg), _method(""), _uri(""), _host(""), _port(80), _path(""), _query(""), _fragment(""), _version(""), _body(""), _headers(), _content_length(0), _transfer_encoding("")
+Request::Request(const std::string& msg) : _return_code(200), _req(msg), _method(""), _uri(""), _host(""), _port(80), _path(""), _query(""), _fragment(""), _version(""), _body(""), _headers()
 {
-
-	std::cout << "Request: " << msg << std::endl;
-
 	try {
 		std::stringstream ss(msg);
 		std::string line;
@@ -48,20 +41,53 @@ Request::Request(const std::string& msg) : _return_code(200), _req(msg), _method
 
 Request::~Request() {}
 
-void Request::Answer()
+std::string getCurrentTime()
 {
-	// Temporary function to test the parsing
-	std::cout << "Method: " << this->_method << std::endl;
-	std::cout << "URI: " << this->_uri << std::endl;
-	std::cout << "Version: " << this->_version << std::endl;
+	time_t rawtime;
+	struct tm *timeinfo;
+	char buffer[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(buffer, 80, "%a, %d %b %Y %H:%M:%S GMT", timeinfo);
+	return std::string(buffer);
+}
+
+std::string Request::getResponse()
+{
+	std::string path = this->_server_config.getRoot() + this->_path;
+	std::ifstream file(path.c_str());
+	if (!file.is_open())
+	{
+		this->_return_code = 404;
+		throw std::runtime_error("Resource not found: " + this->_path);
+	}
+
+	std::string line;
+	while (std::getline(file, line)	&& !file.eof())
+		this->_response += line + "\n";
+
+	std::string response = "HTTP/1.1 200 OK\r\n";
+	response += "Server: webserv/1.0\r\n";
+	response += "Date: " + getCurrentTime() + "\r\n";
+	response += "Content-Type: text/plain \r\n";
+	response += "Content-Length: ";
+	response += static_cast<std::ostringstream*>( &(std::ostringstream() << this->_response.length()) )->str();
+	response += "\r\n";
+	response += "Connection: close\r\n";
+	response += "\r\n";
+	response += this->_body;
+	return response;
 }
 
 void Request::isValidURI()
 {
 	std::size_t index = 0;
 
-	if (this->_uri.empty() ||
-		this->_uri.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%") != std::string::npos){
+	if (this->_uri.empty() || \
+		this->_uri.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%") != std::string::npos || \
+		this->_uri.size() > MAX_URI_SIZE){
 			this->_return_code = 400;
 			throw std::runtime_error("Invalid URI: " + this->_uri);
 		}
@@ -118,4 +144,22 @@ void Request::isValidURI()
 	}
 	else
 		this->_path = "/";
+
+	if (this->_path.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%") != std::string::npos) {
+		this->_return_code = 400;
+		throw std::runtime_error("Invalid path: " + this->_path);
+	}
+
+	if (getResourceType() == "directory"){
+		this->_file = "index.html";
+		if (this->_path[this->_path.length() - 1] != '/')
+			this->_path += "/";
+		this->_path += this->_file;
+	} else if (getResourceType() == "unknown") {
+		this->_return_code = 404;
+		throw std::runtime_error("Resource not found: " + this->_path);
+	} else
+		this->_file = this->_path.substr(this->_path.find_last_of('/') + 1);
+
+	this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
 }

@@ -1,12 +1,25 @@
-#include "../includes/Globals.hpp"
-#include "../includes/Request.hpp"
-#include "../includes/config/ServerConfig.hpp"
+#include "../../includes/Globals.hpp"
+#include "../../includes/request/Request.hpp"
+#include "../../includes/request/Header.hpp"
+#include "../../includes/config/ServerConfig.hpp"
 #include <algorithm>
+#include <sys/stat.h>
+#include <string>
 
-std::string Request::getResponse()
-{
-    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 12\r\n\r\nHello World!";
-    return response;
+std::string Request::getResourceType() {
+
+    std::string path = this->_server_config.getRoot() + this->_path;
+
+    struct stat fileStat;
+    if (stat(path.c_str(), &fileStat) == 0) {
+        if (S_ISREG(fileStat.st_mode)) {
+            return "file";
+        } else if (S_ISDIR(fileStat.st_mode)) {
+            return "directory";
+        }
+    }
+
+    return "unknown";
 }
 
 long stringToLong(const std::string& str) {
@@ -59,7 +72,6 @@ void Request::findHost(const std::string& value)
 
 void Request::headerParsing()
 {
-    this->_headers = std::map<std::string, std::string>();
     while (this->_req.find("\r\n") != std::string::npos && this->_req.find("\r\n") != 0)
     {
         std::string line = this->_req.substr(0, this->_req.find("\r\n"));
@@ -70,17 +82,10 @@ void Request::headerParsing()
         }
         std::string key = line.substr(0, line.find(": "));
         std::string value = line.substr(line.find(": ") + 2);
-        std::string headers_list[] = {"Host", "Content-Length", "Transfer-Encoding"}; // Add other headers here
-        int headers_list_size = sizeof(headers_list) / sizeof(headers_list[0]);
-        int index = -1;
-        for (int i = 0; i < headers_list_size; ++i)
-        {
-            if (headers_list[i] == key)
-            {
-                index = i;
-                break;
-            }
-        }
+
+        this->_headers.updateHeader(key, value);
+
+        int index = this->_headers.getIndex(key);
         switch (index)
         {
             case 0: // Host
@@ -94,31 +99,42 @@ void Request::headerParsing()
                     this->_return_code = 400;
                 else if (static_cast<size_t>(stringToLong(value)) > MAX_BODY_SIZE)
                     this->_return_code = 413;
-                else
-                    this->_content_length = stringToLong(value);
                 break;
             }
             case 2: // Transfer-Encoding
             {
-                if (value == "chunked" || value == "identity")
-                    this->_transfer_encoding = stringToLong(value);
-                else
+                if (value != "chunked" || value != "identity")
                     this->_return_code = 400;
+                break;
+            }
+            case 3: // Content-Type
+            {
+                if (value.find("text/") == std::string::npos && \
+                    value.find("image/") == std::string::npos && \
+                    value.find("audio/") == std::string::npos && \
+                    value.find("video/") == std::string::npos && \
+                    value.find("application/") == std::string::npos && \
+                    value.find("multipart/") == std::string::npos)
+                    this->_return_code = 415;
                 break;
             }
             // Add the other headers case here
             default:
-                std::cout << "Header not found: " << value << std::endl;
+                std::cout << "Header not found: " << key << std::endl;
+                break;
         }
+        this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
     }
 }
 
 void Request::bodyParsing()
 {
-    this -> _body = this->_req.substr(this->_req.find("\r\n\r\n") + 4);
-    if (this->_body.length() != this->_content_length)
+    this -> _body = this->_req.substr(this->_req.find("\r\n") + 2);
+    if (this->_body.length() < static_cast<size_t>(stringToLong(this->_headers.getHeader("Content-Length")))){
         this->_return_code = 400;
-    if (this->_transfer_encoding == "chunked")
+        throw std::runtime_error("Invalid body length");
+    }
+    if (this->_headers.getHeader("Transfer-Encoding") == "chunked")
     {
         std::string chunked = this->_body;
         std::string body = "";
@@ -132,7 +148,7 @@ void Request::bodyParsing()
         }
         this->_body = body;
     } else {
-        this->_body = this->_body.substr(0, this->_content_length);
+        this->_body = this->_body.substr(0, stringToLong(this->_headers.getHeader("Content-Length")));
     }
     return;
 }

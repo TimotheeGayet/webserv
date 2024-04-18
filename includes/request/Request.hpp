@@ -1,6 +1,8 @@
-#pragma once
+#ifndef REQUEST_HPP
+#define REQUEST_HPP
 
-#include "./Globals.hpp"
+#include "../Globals.hpp"
+#include "Header.hpp"
 #include <string>
 #include <map>
 
@@ -15,23 +17,25 @@ class Request
 		std::string 						_host;
 		std::size_t 						_port;
 		std::string 						_path;
+		std::string 						_file;
 		std::string 						_query;
 		std::string 						_fragment;
 		std::string 						_version;
 		std::string 						_body;
-		std::map<std::string, std::string>	_headers;
-		std::size_t 						_content_length;
-		std::string							_transfer_encoding;
+		std::string 						_response;
+		Header 								_headers;
 
 		void 		isValidURI();
 		void    	findHost(const std::string& value);
+		std::string getResourceType();
 
 	public:
 		Request(const std::string &msg);
 		~Request();
 
-		void 		Answer();
 		std::string getResponse();
 		void		headerParsing();
 		void		bodyParsing();
 };
+
+#endif
