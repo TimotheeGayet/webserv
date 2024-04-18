@@ -31,6 +31,7 @@ Request::Request(const std::string& msg) : _return_code(200), _req(msg), _method
 		}
 		isValidURI();
 		headerParsing();
+		locationParsing();
 		bodyParsing();
 	}
 	catch (std::exception &e)
@@ -58,27 +59,42 @@ std::string Request::getResponse()
 {
 	std::string path = this->_server_config.getRoot() + this->_path;
 	std::ifstream file(path.c_str());
-	if (!file.is_open())
-	{
-		this->_return_code = 404;
-		throw std::runtime_error("Resource not found: " + this->_path);
-	}
+	if (!file.is_open() || !file.good() || this->_return_code == 400)
+		return "HTTP/1.1 404 Not Found\r\nServer: webserv/1.0\r\nDate: " + getCurrentTime() + "\r\nContent-Length: 253\r\nConnection: close\r\n\r\n" + g_config.getDefaultErrors().get404() + "\r\n";
 
 	std::string line;
 	while (std::getline(file, line)	&& !file.eof())
 		this->_response += line + "\n";
 
-	std::string response = "HTTP/1.1 200 OK\r\n";
-	response += "Server: webserv/1.0\r\n";
-	response += "Date: " + getCurrentTime() + "\r\n";
-	response += "Content-Type: text/plain \r\n";
-	response += "Content-Length: ";
-	response += static_cast<std::ostringstream*>( &(std::ostringstream() << this->_response.length()) )->str();
-	response += "\r\n";
-	response += "Connection: close\r\n";
-	response += "\r\n";
-	response += this->_body;
-	return response;
+	std::stringstream ss;
+	ss << "HTTP/1.1 200 OK\r\n";
+	ss << "Server: webserv/1.0\r\n";
+	ss << "Date: " << getCurrentTime() << "\r\n";
+	ss << "Content-Length: " << this->_response.length() << "\r\n";
+	ss << "Connection: close\r\n";
+	ss << "\r\n";
+	ss << this->_response;
+	return ss.str();
+}
+
+bool Request::isLocation(const std::string& path) {
+	std::vector<Location> locations = this->_server_config.getLocations();
+	for (std::vector<Location>::iterator it = locations.begin(); it != locations.end(); it++)
+	{
+		if (it->getPath() == path)
+			return true;
+	}
+	return false;
+}
+
+Location Request::getLocation(const std::string& path) {
+	std::vector<Location> locations = this->_server_config.getLocations();
+	for (std::vector<Location>::iterator it = locations.begin(); it != locations.end(); it++)
+	{
+		if (it->getPath() == path)
+			return *it;
+	}
+	return Location();
 }
 
 void Request::isValidURI()
@@ -150,16 +166,35 @@ void Request::isValidURI()
 		throw std::runtime_error("Invalid path: " + this->_path);
 	}
 
+	this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
+}
+
+void Request::locationParsing(){
+	// checking server config locations
+	std::string location = "/";
+	while (isLocation(location) && location.size() < this->_path.size() && this->_path.find('/', location.size()) != std::string::npos){ // INFINITE LOOP WHEN FILE REQUESTED
+		location += this->_path.substr(location.size(), this->_path.find('/'));
+	}
+
+	this->_path.erase(0, location.size());
+	Location loc = getLocation(location);
+	if (loc.getPath() != location)
+		this->_path = this->_server_config.getRoot() + this->_path;
+	else
+		this->_path = loc.getRoot() + this->_path;
+
 	if (getResourceType() == "directory"){
 		this->_file = "index.html";
 		if (this->_path[this->_path.length() - 1] != '/')
 			this->_path += "/";
 		this->_path += this->_file;
-	} else if (getResourceType() == "unknown") {
+	} else if (getResourceType() == "root") {
+		this->_file = "index.html";
+		this->_path += "/" + this->_file;
+	} else if (getResourceType() == "file"){
+		this->_file = this->_path.substr(this->_path.find_last_of('/') + 1);
+	} else {
 		this->_return_code = 404;
 		throw std::runtime_error("Resource not found: " + this->_path);
-	} else
-		this->_file = this->_path.substr(this->_path.find_last_of('/') + 1);
-
-	this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
+	}
 }

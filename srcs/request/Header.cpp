@@ -1,4 +1,5 @@
 #include "../../includes/request/Header.hpp"
+#include <iostream>
 
 Header::Header() {
     this->_headers["Host"] = "";
@@ -32,7 +33,7 @@ std::string Header::getHeader(const std::string &key) const {
 
 int Header::getIndex(const std::string &key) const {
     int index = 0;
-    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it) {
+    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); it++) {
         if (it->first == key)
             return index;
         index++;

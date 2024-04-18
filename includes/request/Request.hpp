@@ -28,14 +28,17 @@ class Request
 		void 		isValidURI();
 		void    	findHost(const std::string& value);
 		std::string getResourceType();
+		bool 		isLocation(const std::string& path);
+		Location	getLocation(const std::string& path);
+		void 		locationParsing();
+		void		headerParsing();
+		void		bodyParsing();
 
 	public:
 		Request(const std::string &msg);
 		~Request();
 
 		std::string getResponse();
-		void		headerParsing();
-		void		bodyParsing();
 };
 
 #endif

@@ -7,11 +7,8 @@
 #include <string>
 
 std::string Request::getResourceType() {
-
-    std::string path = this->_server_config.getRoot() + this->_path;
-
     struct stat fileStat;
-    if (stat(path.c_str(), &fileStat) == 0) {
+    if (stat(this->_path.c_str(), &fileStat) == 0) {
         if (S_ISREG(fileStat.st_mode)) {
             return "file";
         } else if (S_ISDIR(fileStat.st_mode)) {
@@ -19,6 +16,8 @@ std::string Request::getResourceType() {
         }
     }
 
+    if (this->_path == "/")
+        return "root";
     return "unknown";
 }
 
@@ -88,7 +87,7 @@ void Request::headerParsing()
         int index = this->_headers.getIndex(key);
         switch (index)
         {
-            case 0: // Host
+            case 9: // Host
             {
                 findHost(value);
                 break;
@@ -120,7 +119,7 @@ void Request::headerParsing()
             }
             // Add the other headers case here
             default:
-                std::cout << "Header not found: " << key << std::endl;
+                std::cout << "Header not found: " << key << " - Index was : " << index << std::endl;
                 break;
         }
         this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
