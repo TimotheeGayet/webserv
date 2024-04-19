@@ -13,4 +13,3 @@ class CgiHandler {
     public:
         static std::string execute_cgi(const std::string& filename);
 };
-
