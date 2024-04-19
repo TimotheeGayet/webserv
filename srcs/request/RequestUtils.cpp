@@ -119,7 +119,6 @@ void Request::headerParsing()
             }
             // Add the other headers case here
             default:
-                std::cout << "Header not found: " << key << " - Index was : " << index << std::endl;
                 break;
         }
         this->_req = this->_req.substr(this->_req.find("\r\n") + 2);

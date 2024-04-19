@@ -146,8 +146,6 @@ int Server::run() {
                     } else {
                         // data received -> handle the HTTP request
 
-                        std::cout << "Received: " << std::string(buffer, bytes_received) << std::endl;
-
                         std::string request(buffer, bytes_received);
                     
                         Request req(request);

@@ -81,8 +81,9 @@ bool Request::isLocation(const std::string& path) {
 	std::vector<Location> locations = this->_server_config.getLocations();
 	for (std::vector<Location>::iterator it = locations.begin(); it != locations.end(); it++)
 	{
-		if (it->getPath() == path)
+		if (it->getPath() == path){
 			return true;
+		}
 	}
 	return false;
 }
@@ -169,11 +170,14 @@ void Request::isValidURI()
 	this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
 }
 
-void Request::locationParsing(){
+void Request::locationParsing()
+{
 	// checking server config locations
 	std::string location = "/";
-	while (isLocation(location) && location.size() < this->_path.size() && this->_path.find('/', location.size()) != std::string::npos){ // INFINITE LOOP WHEN FILE REQUESTED
-		location += this->_path.substr(location.size(), this->_path.find('/'));
+	std::size_t slashPos = this->_path.find('/', location.size());
+	while (slashPos != std::string::npos && isLocation(location + this->_path.substr(location.size(), slashPos - location.size()))){
+		location += this->_path.substr(location.size(), slashPos - location.size());
+		slashPos = this->_path.find('/', slashPos + 1);
 	}
 
 	this->_path.erase(0, location.size());
