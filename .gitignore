@@ -1,1 +1,7 @@
 .vscode
+build
+webserv
+
+# Testing websites
+htdocs
+simple-php-website
