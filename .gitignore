@@ -3,3 +3,4 @@ build
 webserv
 tmp
 **/a.out
+htdocs
