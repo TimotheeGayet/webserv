@@ -22,10 +22,9 @@ Request::Request(const std::string& msg) : _return_code(200), _req(msg), _method
 				this->_version = item;
 		}
 
-		if (count != 3 || \
-			this->_version != "HTTP/1.1\r" || \
-			line.substr(line.length() - 1) != "\r" || \
-			(this->_method != "GET" && this->_method != "POST" && this->_method != "DELETE")){
+		if (count != 3 || this->_version != "HTTP/1.1\r" || \
+			line.substr(line.length() - 1) != "\r" || (this->_method != "GET" && this->_method != "POST" && this->_method != "DELETE"))
+		{
 			this->_return_code = 400;
 			throw std::runtime_error("Invalid request line: " + line);
 		}
@@ -36,11 +35,17 @@ Request::Request(const std::string& msg) : _return_code(200), _req(msg), _method
 	}
 	catch (std::exception &e)
 	{
-		std::cerr << "Error: " << e.what() << std::endl;
+		std::cerr << "webserv: Error: " << e.what() << std::endl << std::endl;
+		this->_response = "HTTP/1.1 " + g_config.getDefaultErrors().getError(this->_return_code) + "\r\nServer: serveur_du_web\r\nDate: " + getCurrentTime() + "\r\nContent-Length:" + std::to_string(g_config.getDefaultErrors().getErrorPage(this->_return_code).length()) + "\r\nConnection: close\r\n\r\n" + g_config.getDefaultErrors().getErrorPage(this->_return_code) + "\r\n";
 	}
 }
 
 Request::~Request() {}
+
+std::string Request::getFile()
+{
+	return this->_file;
+}
 
 std::string getCurrentTime()
 {
@@ -60,7 +65,7 @@ std::string Request::getResponse()
 	std::string path = this->_server_config.getRoot() + this->_path;
 	std::ifstream file(path.c_str());
 	if (!file.is_open() || !file.good() || this->_return_code == 400)
-		return "HTTP/1.1 404 Not Found\r\nServer: webserv/1.0\r\nDate: " + getCurrentTime() + "\r\nContent-Length: 253\r\nConnection: close\r\n\r\n" + g_config.getDefaultErrors().get404() + "\r\n";
+		return "HTTP/1.1 404 Not Found\r\nServer: serveur_du_web\r\nDate: " + getCurrentTime() + "\r\nContent-Length: 253\r\nConnection: close\r\n\r\n" + g_config.getDefaultErrors().get404() + "\r\n";
 
 	std::string line;
 	while (std::getline(file, line)	&& !file.eof())
@@ -68,10 +73,10 @@ std::string Request::getResponse()
 
 	std::stringstream ss;
 	ss << "HTTP/1.1 200 OK\r\n";
-	ss << "Server: webserv/1.0\r\n";
+	ss << "Server: serveur_du_web\r\n";
 	ss << "Date: " << getCurrentTime() << "\r\n";
 	ss << "Content-Length: " << this->_response.length() << "\r\n";
-	ss << "Connection: close\r\n";
+	ss << "Connection: keep-alive\r\n";
 	ss << "\r\n";
 	ss << this->_response;
 	return ss.str();
@@ -129,7 +134,7 @@ void Request::isValidURI()
 				this->_return_code = 400;
 				throw std::runtime_error("Invalid port: " + this->_uri);
 			}
-			this->_port = std::strtod(port.c_str(), NULL);
+			this->_port = std::strtoul(port.c_str(), NULL, 10);
 		}
 		index = authorityEnd;
 	}
@@ -187,13 +192,11 @@ void Request::locationParsing()
 	else
 		this->_path = loc.getRoot() + this->_path;
 
-	if (getResourceType() == "directory"){
-		this->_file = "index.html";
-		if (this->_path[this->_path.length() - 1] != '/')
-			this->_path += "/";
-		this->_path += this->_file;
-	} else if (getResourceType() == "root") {
-		this->_file = "index.html";
+	if (getResourceType() == "directory" || getResourceType() == "root"){
+		if (loc.getIndex().empty())
+			this->_file = "index.html";
+		else
+			this->_file = loc.getIndex();
 		this->_path += "/" + this->_file;
 	} else if (getResourceType() == "file"){
 		this->_file = this->_path.substr(this->_path.find_last_of('/') + 1);

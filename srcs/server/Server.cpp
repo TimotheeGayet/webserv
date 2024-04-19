@@ -136,6 +136,7 @@ int Server::run() {
                     int bytes_received = recv(fd, buffer, sizeof(buffer), 0);
                     if (bytes_received <= 0) {
                         // no data received -> client disconnected or error
+                        
                         if (bytes_received == 0) {
                             std::cout << "Client disconnected" << std::endl;
                         } else {
@@ -145,14 +146,23 @@ int Server::run() {
                         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
                     } else {
                         // data received -> handle the HTTP request
-
+                        
                         std::string request(buffer, bytes_received);
                     
                         Request req(request);
-                        std::string response = req.getResponse();
+                        std::string file = req.getFile();
+
+                        // CGI handling
+                        std::string response;
+                        if (!file.empty() && file.substr(file.find_last_of('.')) == ".php")
+                        {
+                        }
+                        else {
+                            response = req.getResponse();
+                        }
 
                         int bytes_sent = send(fd, response.c_str(), response.size(), 0);
-                        if (bytes_sent != static_cast<int>(response.size())) {
+                        if (bytes_sent != static_cast<int>(response.size())){
                             std::cerr << "error: send" << std::endl;
                             close(fd);
                             epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);

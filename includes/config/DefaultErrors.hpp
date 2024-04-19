@@ -9,6 +9,9 @@ class DefaultErrors {
         DefaultErrors();
         ~DefaultErrors();
 
+        std::string getError(int code);
+        std::string getErrorPage(int code);
+
         const std::string &get400() const { return _400; }
         const std::string &get401() const { return _401; }
         const std::string &get403() const { return _403; }
