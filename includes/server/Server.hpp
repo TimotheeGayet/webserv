@@ -14,6 +14,7 @@
 #include <signal.h>
 #include <cstdlib>
 #include "../config/GlobalConfig.hpp"
+#include "../cgi/CgiHandler.hpp"
 
 struct SocketInfo {
     int socket_fd;

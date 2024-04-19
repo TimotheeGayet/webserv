@@ -8,9 +8,9 @@ FLAGS := -Wall -Wextra -Werror -std=c++98
 
 OBJDIR := build/
 
-SRCS := main.cpp srcs/config/GlobalConfig.cpp srcs/config/ServerConfig.cpp srcs/config/Location.cpp srcs/server/Server.cpp srcs/config/DefaultErrors.cpp srcs/Globals.cpp srcs/utils.cpp srcs/request/Request.cpp srcs/request/RequestUtils.cpp srcs/request/Header.cpp
+SRCS := main.cpp srcs/config/GlobalConfig.cpp srcs/config/ServerConfig.cpp srcs/config/Location.cpp srcs/server/Server.cpp srcs/config/DefaultErrors.cpp srcs/Globals.cpp srcs/utils.cpp srcs/request/Request.cpp srcs/request/RequestUtils.cpp srcs/request/Header.cpp srcs/cgi/CgiHandler.cpp
 
-HEADERS := $(HEADER)/config/GlobalConfig.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/server/Server.hpp $(HEADER)/config/DefaultErrors.hpp $(HEADER)/Globals.hpp $(HEADER)/utils.hpp $(HEADER)/request/Request.hpp $(HEADER)/request/Header.hpp
+HEADERS := $(HEADER)/config/GlobalConfig.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/server/Server.hpp $(HEADER)/config/DefaultErrors.hpp $(HEADER)/Globals.hpp $(HEADER)/utils.hpp $(HEADER)/request/Request.hpp $(HEADER)/request/Header.hpp $(HEADER)/cgi/CgiHandler.hpp
 
 OBJS := $(addprefix $(OBJDIR),$(SRCS:.cpp=.o))
 
@@ -29,6 +29,7 @@ $(OBJDIR):
 	@echo "\033[1;97mwebserv: \033[0;33mMaking build directories ...\033[0;m"
 	mkdir -p $(OBJDIR)srcs/config
 	mkdir -p $(OBJDIR)srcs/request
+	mkdir -p $(OBJDIR)srcs/cgi
 	mkdir -p $(OBJDIR)srcs/server
 	@echo "\033[1;97mwebserv: \033[1;32mbuild directory done.\n\033[0;m"
 

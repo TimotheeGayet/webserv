@@ -156,6 +156,7 @@ int Server::run() {
                         std::string response;
                         if (!file.empty() && file.substr(file.find_last_of('.')) == ".php")
                         {
+                            response = CgiHandler::execute_cgi(file);
                         }
                         else {
                             response = req.getResponse();
