@@ -74,24 +74,37 @@ std::string Request::getResponse()
 {
 	std::string path = this->_server_config.getRoot() + this->_path;
 	std::string filename = this->_file;
+	std::string contentType = "text/html"; // default to HTML
 
-	if (!filename.empty() && filename.substr(filename.find_last_of('.')) == ".php") {
-		this->_response = CgiHandler::execute_cgi(path);
+	if (!filename.empty()) {
+		std::string extension = filename.substr(filename.find_last_of('.'));
+		if (extension == ".php") {
+			this->_response = CgiHandler::execute_cgi(path);
+			contentType = "text/html"; // PHP scripts output HTML
+		} else if (extension == ".css") {
+			contentType = "text/css"; // CSS files
+		} else if (extension == ".jpg" || extension == ".jpeg") {
+			contentType = "image/jpeg"; // JPEG images
+		} else if (extension == ".png") {
+			contentType = "image/png"; // PNG images
+		} else if (extension == ".js") {
+			contentType = "application/javascript"; // JavaScript files
+		}
 	}
-	else {
-		std::ifstream file(path.c_str());
-		if (!file.is_open() || !file.good() || this->_return_code == 400)
-			return "HTTP/1.1 404 Not Found\r\nServer: serveur_du_web\r\nDate: " + getCurrentTime() + "\r\nContent-Length: 253\r\nConnection: close\r\n\r\n" + g_config.getDefaultErrors().get404() + "\r\n";
 
-		std::string line;
-		while (std::getline(file, line)	&& !file.eof())
-			this->_response += line + "\n";
-	}
+	std::ifstream file(path.c_str());
+	if (!file.is_open() || !file.good() || this->_return_code == 400)
+		return "HTTP/1.1 404 Not Found\r\nServer: serveur_du_web\r\nDate: " + getCurrentTime() + "\r\nContent-Length: 253\r\nConnection: close\r\n\r\n" + g_config.getDefaultErrors().get404() + "\r\n";
+
+	std::string line;
+	while (std::getline(file, line) && !file.eof())
+		this->_response += line + "\n";
 
 	std::stringstream ss;
 	ss << "HTTP/1.1 200 OK\r\n";
 	ss << "Server: serveur_du_web\r\n";
 	ss << "Date: " << getCurrentTime() << "\r\n";
+	ss << "Content-Type: " << contentType << "; charset=UTF-8\r\n"; // set the Content-Type header
 	ss << "Content-Length: " << this->_response.length() << "\r\n";
 	ss << "Connection: keep-alive\r\n";
 	ss << "\r\n";
