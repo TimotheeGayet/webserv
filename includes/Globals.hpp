@@ -7,8 +7,8 @@
 #include "./server/Server.hpp"
 #include "./config/GlobalConfig.hpp"
 
-extern size_t                  MAX_BODY_SIZE; // 1 MB
-extern size_t                  MAX_URI_SIZE; //  80000 bytes (Safari max-url size based)
+extern size_t                  MAX_BODY_SIZE;
+extern size_t                  MAX_URI_SIZE;
 extern std::string             php_cgi_path;
 
 extern int                     epoll_fd;

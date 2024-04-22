@@ -84,6 +84,14 @@ void Request::headerParsing()
 
         this->_headers.updateHeader(key, value);
 
+        switch (this->_headers.getIndex(key))
+        {
+            case this->_headers.getIndex("Host"):
+                this->_host = value;
+                break;
+        }
+
+
         if (key == "Host")
         {
             findHost(value);

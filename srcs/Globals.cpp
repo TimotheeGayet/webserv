@@ -9,4 +9,4 @@ std::string             illustration("\n███████ ██████
 GlobalConfig            g_config = GlobalConfig();
 std::string             php_cgi_path("/usr/bin/php-cgi");
 size_t                  MAX_BODY_SIZE = 1024 * 1024; // 1 MB
-size_t                  MAX_URI_SIZE = 80000; // 80000 bytes (Safari max-url size based)
+size_t                  MAX_URI_SIZE = 2048; // 2048 bytes

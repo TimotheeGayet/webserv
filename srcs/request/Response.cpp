@@ -35,27 +35,27 @@ std::string Response::getResponse() {
 		} else if (extension == ".png") {
 			contentType = "image/png";
 		} else if (extension == ".gif") {
-            contentType = "image/gif";
-        } else if (extension == ".ico") {
-            contentType = "image/x-icon";
-        } else if (extension == ".html") {
-            contentType = "text/html";
-        } else if (extension == ".txt") {
-            contentType = "text/plain";
-        }
+			contentType = "image/gif";
+		} else if (extension == ".ico") {
+			contentType = "image/x-icon";
+		} else if (extension == ".html") {
+			contentType = "text/html";
+		} else if (extension == ".txt") {
+			contentType = "text/plain";
+		}
 	}
 
 	std::ifstream file(path.c_str());
 	if (!file.is_open() || !file.good() || this->_request.getReturnCode() != 200)
-    {
-        std::stringstream ss;
-        ss << "HTTP/1.1" << this->_request.getReturnCode() << " " << g_config.getDefaultErrors().getError(this->_request.getReturnCode()) << "\r\n";
-        ss << "Server: serveur_du_web\r\nDate: " << getCurrentTime() << "\r\n";
-        ss << "Content-Length: " << g_config.getDefaultErrors().getErrorPage(this->_request.getReturnCode()).length() << "\r\n";
-        ss << "Connection: close\r\n\r\n";
-        ss << g_config.getDefaultErrors().getErrorPage(this->_request.getReturnCode()) + "\r\n";
-        return ss.str();
-    }
+	{
+		std::stringstream ss;
+		ss << "HTTP/1.1" << this->_request.getReturnCode() << " " << g_config.getDefaultErrors().getError(this->_request.getReturnCode()) << "\r\n";
+		ss << "Server: serveur_du_web\r\nDate: " << getCurrentTime() << "\r\n";
+		ss << "Content-Length: " << g_config.getDefaultErrors().getErrorPage(this->_request.getReturnCode()).length() << "\r\n";
+		ss << "Connection: close\r\n\r\n";
+		ss << g_config.getDefaultErrors().getErrorPage(this->_request.getReturnCode()) + "\r\n";
+		return ss.str();
+	}
 
 	std::string line;
 	while (std::getline(file, line) && !file.eof())
