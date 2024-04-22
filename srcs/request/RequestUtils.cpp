@@ -21,7 +21,7 @@ std::string Request::getResourceType() {
     return "unknown";
 }
 
-long stringToLong(const std::string& str) {
+long Request::stringToLong(const std::string& str) {
     long result = 0;
     int sign = 1;
     int i = 0;
@@ -42,33 +42,6 @@ long stringToLong(const std::string& str) {
     return sign * result;
 }
 
-void Request::findHost(const std::string& value)
-{
-    size_t colonPos = value.find(':');
-    std::string host = value.substr(0, colonPos);
-    int port = -1;
-    if (colonPos != std::string::npos)
-        port = stringToLong(value.substr(colonPos + 1));
-
-    const std::vector<ServerConfig>& serverConfigs = g_config.getServerConfigs();
-    std::vector<ServerConfig>::const_iterator it = serverConfigs.begin();
-    std::vector<ServerConfig>::const_iterator end = serverConfigs.end();
-    for (; it != end; ++it)
-    {
-        if (it->getServerName() == host)
-        {
-            this->_server_config = *it;
-            return;
-        }
-        else if (port != -1 && it->getPort() == port)
-        {
-            this->_server_config = *it;
-            return;
-        }
-    }
-    this->_server_config = g_config.getServerConfigs().front();
-}
-
 void Request::headerParsing()
 {
     while (this->_req.find("\r\n") != std::string::npos && this->_req.find("\r\n") != 0)
@@ -81,52 +54,18 @@ void Request::headerParsing()
         }
         std::string key = line.substr(0, line.find(": "));
         std::string value = line.substr(line.find(": ") + 2);
+        
+        this->_headers.addHeader(key, value); // Add header to the headers map
 
-        this->_headers.updateHeader(key, value);
-
-        switch (this->_headers.getIndex(key))
-        {
-            case this->_headers.getIndex("Host"):
-                this->_host = value;
-                break;
-        }
-
-
-        if (key == "Host")
-        {
-            findHost(value);
-        }
-        else if (key == "Content-Length")
-        {
-            if (value.find_first_not_of("0123456789") != std::string::npos)
-                this->_return_code = 400;
-            else if (static_cast<size_t>(stringToLong(value)) > MAX_BODY_SIZE)
-                this->_return_code = 413;
-        }
-        else if (key == "Transfer-Encoding")
-        {
-            if (value != "chunked" || value != "identity")
-                this->_return_code = 400;
-        }
-        else if (key == "Content-Type")
-        {
-            if (value.find("text/") == std::string::npos && \
-                value.find("image/") == std::string::npos && \
-                value.find("audio/") == std::string::npos && \
-                value.find("video/") == std::string::npos && \
-                value.find("application/") == std::string::npos && \
-                value.find("multipart/") == std::string::npos)
-                    this->_return_code = 415;
-        }
-        // Add the other headers cases here
         this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
     }
+    this->processHeaders(this->_headers.getHeaders());
 }
 
 void Request::bodyParsing()
 {
     this -> _body = this->_req.substr(this->_req.find("\r\n") + 2);
-    if (this->_body.length() < static_cast<size_t>(stringToLong(this->_headers.getHeader("Content-Length")))){
+    if (this->_body.length() < static_cast<size_t>(this->stringToLong(this->_headers.getHeader("Content-Length")))){
         this->_return_code = 400;
         throw std::runtime_error("Invalid body length");
     }
@@ -136,7 +75,7 @@ void Request::bodyParsing()
         std::string body = "";
         while (chunked.length() > 0)
         {
-            size_t chunkSize = stringToLong(chunked.substr(0, chunked.find("\r\n")));
+            size_t chunkSize = this->stringToLong(chunked.substr(0, chunked.find("\r\n")));
             if (chunkSize == 0)
                 break;
             body += chunked.substr(chunked.find("\r\n") + 2, chunkSize);
@@ -144,7 +83,7 @@ void Request::bodyParsing()
         }
         this->_body = body;
     } else {
-        this->_body = this->_body.substr(0, stringToLong(this->_headers.getHeader("Content-Length")));
+        this->_body = this->_body.substr(0, this->stringToLong(this->_headers.getHeader("Content-Length")));
     }
     return;
 }

@@ -161,9 +161,8 @@ void Request::locationParsing()
 		this->_path = loc.getRoot() + this->_path;
 
 	if (getResourceType() == "directory" || getResourceType() == "root"){
-		if (loc.getIndex().empty()){
+		if (loc.getIndex().empty())
 			this->_file = "index.html";
-		}
 		else
 			this->_file = loc.getIndex();
 		this->_path += "/" + this->_file;

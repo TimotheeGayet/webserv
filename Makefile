@@ -14,7 +14,7 @@ SRCS := main.cpp \
 	./srcs/request/Request.cpp srcs/request/RequestUtils.cpp srcs/request/Header.cpp \
 	./srcs/cgi/CgiHandler.cpp \
 	./srcs/Globals.cpp ./srcs/utils.cpp \
-	./srcs/request/Response.cpp
+	./srcs/request/Response.cpp ./srcs/request/HeadersFunctions.cpp
 
 HEADERS := \
 	$(HEADER)/config/GlobalConfig.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/config/DefaultErrors.hpp \

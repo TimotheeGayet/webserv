@@ -13,28 +13,40 @@ class Request
 		int 					_return_code;
 		ServerConfig 			_server_config;
 
-		// Request parts
-		std::string 			_method;
-		std::string 			_uri;
-		std::string 				_host;
-		u_int16_t 					_port;
-		std::string 				_path;
-		std::string 				_file;
-		std::string 				_query;
-		std::string 				_fragment;
-		std::string 			_version;
+		// Request parts attributes
+		std::string 			_method; // GET, POST, DELETE
+		std::string 			_uri; // method://host:port/path/to/file?query#fragment
+		std::string 			_host; // www.example.com
+		u_int16_t 				_port; // 80
+		std::string 			_path; // /path/to/file
+		std::string 			_file; // file.ext
+		std::string 			_query;	// query (key=value&key2=value2)
+		std::string 			_fragment; // fragment (#fragment)
+		std::string 			_version; // HTTP/1.1
 		std::string 			_body;
 		std::string 			_response;
-		Header 					_headers;
 
+		// Request parts methods
 		void 					isValidURI();
 		void					bodyParsing();
 		void					headerParsing();
 		void 					locationParsing();
 		std::string 			getResourceType();
-		void    				findHost(const std::string& value);
 		bool 					isLocation(const std::string& path);
 		Location				getLocation(const std::string& path);
+
+		// Headers
+		Header 					_headers;
+		void					setupHandlers();
+		void					handleHost(const std::string& value);
+		void					handleContentType(const std::string& value);
+		void					handleContentLength(const std::string& value);
+		void					handleTransferEncoding(const std::string& value);
+		// Add more handlers here
+		void					processHeaders(const std::map<std::string, std::string>& headers);
+
+		// Utils
+		long 					stringToLong(const std::string& str);
 
 	public:
 		Request(const std::string &msg);
@@ -42,10 +54,9 @@ class Request
 
 		std::string 			getFile();
 		std::string 			getPath();
-		std::string 			getPath() const;
-		std::string 			getFile() const;
 		int 					getReturnCode() const;
 		ServerConfig 			getServerConfig() const;
+
 };
 
 #endif
