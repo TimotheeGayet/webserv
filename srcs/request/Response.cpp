@@ -22,11 +22,11 @@ std::string Response::getResponse() {
 	std::string path = this->_request.getServerConfig().getRoot() + this->_request.getPath();
 	std::string filename = this->_request.getFile();
 	std::string contentType = "text/html";
+	std::string extension;
 
 	if (!filename.empty()) {
-		std::string extension = filename.substr(filename.find_last_of('.'));
+		extension = filename.substr(filename.find_last_of('.'));
 		if (extension == ".php") {
-			this->_response = CgiHandler::execute_cgi(path) + "\r\n";
 			contentType = "text/html";
 		} else if (extension == ".css") {
 			contentType = "text/css";
@@ -65,9 +65,9 @@ std::string Response::getResponse() {
 	ss << "HTTP/1.1 200 OK\r\n";
 	ss << "Server: serveur_du_web\r\n";
 	ss << "Date: " << getCurrentTime() << "\r\n";
-	ss << "Content-Type: " << contentType << "; charset=UTF-8\r\n";
-	ss << "Content-Length: " << this->_response.length() << "\r\n";
 	ss << "Connection: keep-alive\r\n";
+	ss << "Content-Type: " << contentType << "\r\n";
+	ss << "Content-Length: " << this->_response.length() << "\r\n";
 	ss << "\r\n";
 	ss << this->_response;
 	return ss.str();

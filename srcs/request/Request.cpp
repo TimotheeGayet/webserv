@@ -46,8 +46,7 @@ std::string Request::getFile()
 	return this->_file;
 }
 
-int Request::getReturnCode() const
-{
+int Request::getReturnCode() const {
 	return this->_return_code;
 }
 

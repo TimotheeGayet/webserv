@@ -3,5 +3,9 @@ build
 webserv
 
 # Testing websites
-htdocs
-simple-php-website
+html-website
+php-website
+
+ubuntu_tester
+ubuntu_cgi_tester
+YoupiBanane

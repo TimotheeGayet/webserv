@@ -76,7 +76,7 @@ GlobalConfig::GlobalConfig(const std::string &path)
             if (currentServer == NULL) {
                 throw std::runtime_error("GlobalConfiguration error : 'location' section before server definition");
             }
-            if (currentServer->parseLocations(file, line, section) == 1) {
+            if (currentServer->parseServerLocation(file, line, section) == 1) {
                 if (currentServer != NULL && !currentServer->isConfigured()) {
                     throw std::runtime_error("GlobalConfiguration error : 'server' section without GlobalConfiguration");
                 }

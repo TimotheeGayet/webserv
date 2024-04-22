@@ -18,11 +18,11 @@ class ServerConfig {
         ServerConfig();
         ~ServerConfig();
 
-        void                        parseServerConfig(const std::string &line);
-        int                         parseLocations(std::ifstream& file, const std::string& firstLine, std::string& section);
         bool                        isConfigured() const;
+        void                        parseServerConfig(const std::string &line);
+        int                         parseServerLocation(std::ifstream& file, const std::string& firstLine, std::string& section);
 
-        u_int16_t                    getPort() const;
+        u_int16_t                   getPort() const;
         std::vector<Location>       getLocations() const;
         std::string                 getRoot() const;
         std::string                 getServerName() const;

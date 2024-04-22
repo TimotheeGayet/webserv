@@ -127,7 +127,7 @@ void ServerConfig::parseServerConfig(const std::string& line) {
     }
 }
 
-int ServerConfig::parseLocations(std::ifstream& file, const std::string& firstLine, std::string& section) {
+int ServerConfig::parseServerLocation(std::ifstream& file, const std::string& firstLine, std::string& section) {
     Location    location;
     int         value;
 
