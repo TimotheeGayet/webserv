@@ -9,9 +9,9 @@
 class Request
 {
 	private:
-		ServerConfig 			_server_config;
-		int 					_return_code;
 		std::string 			_req;
+		int 					_return_code;
+		ServerConfig 			_server_config;
 
 		// Request parts
 		std::string 			_method;
@@ -28,23 +28,24 @@ class Request
 		Header 					_headers;
 
 		void 					isValidURI();
-		void    				findHost(const std::string& value);
+		void					bodyParsing();
+		void					headerParsing();
+		void 					locationParsing();
 		std::string 			getResourceType();
+		void    				findHost(const std::string& value);
 		bool 					isLocation(const std::string& path);
 		Location				getLocation(const std::string& path);
-		void 					locationParsing();
-		void					headerParsing();
-		void					bodyParsing();
-
 
 	public:
 		Request(const std::string &msg);
 		~Request();
 
 		std::string 			getFile();
-		std::string 			getResponse();
 		std::string 			getPath();
-		ServerConfig 			getServerConfig();
+		std::string 			getPath() const;
+		std::string 			getFile() const;
+		int 					getReturnCode() const;
+		ServerConfig 			getServerConfig() const;
 };
 
 #endif

@@ -2,21 +2,7 @@
 #include "../../includes/Globals.hpp"
 #include <string>
 
-std::string getCurrentTime()
-{
-	time_t rawtime;
-	struct tm *timeinfo;
-	char buffer[80];
-
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-
-	strftime(buffer, 80, "%a, %d %b %Y %H:%M:%S GMT", timeinfo);
-	return std::string(buffer);
-}
-
-Request::Request(const std::string& msg) : _return_code(200), _req(msg), _method(""), _uri(""), _host(""), _port(80), _path(""), _query(""), _fragment(""), _version(""), _body(""), _headers()
-{
+Request::Request(const std::string& msg) : _req(msg), _return_code(200){
 	try {
 		std::stringstream ss(msg);
 		std::string line;
@@ -50,15 +36,6 @@ Request::Request(const std::string& msg) : _return_code(200), _req(msg), _method
 	catch (std::exception &e)
 	{
 		std::cerr << "webserv: Error: " << e.what() << std::endl << std::endl;
-		std::stringstream ss;
-		ss << "HTTP/1.1 " << g_config.getDefaultErrors().getError(this->_return_code) << "\r\n";
-		ss << "Server: serveur_du_web\r\n";
-		ss << "Date: " << getCurrentTime() << "\r\n";
-		ss << "Content-Length:" << g_config.getDefaultErrors().getErrorPage(this->_return_code).length() << "\r\n";
-		ss << "Connection: close\r\n";
-		ss << "\r\n";
-		ss << g_config.getDefaultErrors().getErrorPage(this->_return_code) << "\r\n";
-		this->_response = ss.str();
 	}
 }
 
@@ -69,34 +46,9 @@ std::string Request::getFile()
 	return this->_file;
 }
 
-
-std::string Request::getResponse()
+int Request::getReturnCode() const
 {
-	std::string path = this->_server_config.getRoot() + this->_path;
-	std::string filename = this->_file;
-
-	if (!filename.empty() && filename.substr(filename.find_last_of('.')) == ".php") {
-		this->_response = CgiHandler::execute_cgi(path);
-	}
-	else {
-		std::ifstream file(path.c_str());
-		if (!file.is_open() || !file.good() || this->_return_code == 400)
-			return "HTTP/1.1 404 Not Found\r\nServer: serveur_du_web\r\nDate: " + getCurrentTime() + "\r\nContent-Length: 253\r\nConnection: close\r\n\r\n" + g_config.getDefaultErrors().get404() + "\r\n";
-
-		std::string line;
-		while (std::getline(file, line)	&& !file.eof())
-			this->_response += line + "\n";
-	}
-
-	std::stringstream ss;
-	ss << "HTTP/1.1 200 OK\r\n";
-	ss << "Server: serveur_du_web\r\n";
-	ss << "Date: " << getCurrentTime() << "\r\n";
-	ss << "Content-Length: " << this->_response.length() << "\r\n";
-	ss << "Connection: keep-alive\r\n";
-	ss << "\r\n";
-	ss << this->_response;
-	return ss.str();
+	return this->_return_code;
 }
 
 bool Request::isLocation(const std::string& path) {
@@ -228,6 +180,6 @@ std::string Request::getPath() {
 	return this->_path;
 }
 
-ServerConfig Request::getServerConfig() {
+ServerConfig Request::getServerConfig() const {
 	return this->_server_config;
 }
