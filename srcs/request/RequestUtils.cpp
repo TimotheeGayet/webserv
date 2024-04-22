@@ -65,7 +65,13 @@ void Request::headerParsing()
 void Request::bodyParsing()
 {
     this -> _body = this->_req.substr(this->_req.find("\r\n") + 2);
-    if (this->_body.length() < static_cast<size_t>(this->stringToLong(this->_headers.getHeader("Content-Length")))){
+    if (this->_headers.getHeader("Content-Length") == "")
+    {
+        this->_return_code = 411;
+        throw std::runtime_error("Content-Length header is missing");
+    }
+    if (this->_body.length() < static_cast<size_t>(this->stringToLong(this->_headers.getHeader("Content-Length"))))
+    {
         this->_return_code = 400;
         throw std::runtime_error("Invalid body length");
     }

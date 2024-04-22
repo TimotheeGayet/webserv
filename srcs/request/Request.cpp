@@ -22,11 +22,20 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200){
 				this->_version = item;
 		}
 
-		if (count != 3 || this->_version != "HTTP/1.1\r" || \
-			line.substr(line.length() - 1) != "\r" || (this->_method != "GET" && this->_method != "POST" && this->_method != "DELETE"))
+		if (count != 3 || line.substr(line.length() - 1) != "\r")
 		{
 			this->_return_code = 400;
 			throw std::runtime_error("Invalid request line: " + line);
+		}
+		if (this->_version != "HTTP/1.1\r")
+		{
+			this->_return_code = 505;
+			throw std::runtime_error("HTTP Version Not Supported: " + line);
+		}
+		if (this->_method != "GET" && this->_method != "POST" && this->_method != "DELETE")
+		{
+			this->_return_code = 501;
+			throw std::runtime_error("Not Implemented: " + line);
 		}
 		isValidURI();
 		headerParsing();
