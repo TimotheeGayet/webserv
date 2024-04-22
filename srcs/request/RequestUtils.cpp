@@ -84,43 +84,33 @@ void Request::headerParsing()
 
         this->_headers.updateHeader(key, value);
 
-        int index = this->_headers.getIndex(key);
-        switch (index)
+        if (key == "Host")
         {
-            case 9: // Host
-            {
-                findHost(value);
-                break;
-            }
-            case 1: // Content-Length
-            {
-                if (value.find_first_not_of("0123456789") != std::string::npos)
-                    this->_return_code = 400;
-                else if (static_cast<size_t>(stringToLong(value)) > MAX_BODY_SIZE)
-                    this->_return_code = 413;
-                break;
-            }
-            case 2: // Transfer-Encoding
-            {
-                if (value != "chunked" || value != "identity")
-                    this->_return_code = 400;
-                break;
-            }
-            case 3: // Content-Type
-            {
-                if (value.find("text/") == std::string::npos && \
-                    value.find("image/") == std::string::npos && \
-                    value.find("audio/") == std::string::npos && \
-                    value.find("video/") == std::string::npos && \
-                    value.find("application/") == std::string::npos && \
-                    value.find("multipart/") == std::string::npos)
-                    this->_return_code = 415;
-                break;
-            }
-            // Add the other headers case here
-            default:
-                break;
+            findHost(value);
         }
+        else if (key == "Content-Length")
+        {
+            if (value.find_first_not_of("0123456789") != std::string::npos)
+                this->_return_code = 400;
+            else if (static_cast<size_t>(stringToLong(value)) > MAX_BODY_SIZE)
+                this->_return_code = 413;
+        }
+        else if (key == "Transfer-Encoding")
+        {
+            if (value != "chunked" || value != "identity")
+                this->_return_code = 400;
+        }
+        else if (key == "Content-Type")
+        {
+            if (value.find("text/") == std::string::npos && \
+                value.find("image/") == std::string::npos && \
+                value.find("audio/") == std::string::npos && \
+                value.find("video/") == std::string::npos && \
+                value.find("application/") == std::string::npos && \
+                value.find("multipart/") == std::string::npos)
+                    this->_return_code = 415;
+        }
+        // Add the other headers cases here
         this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
     }
 }

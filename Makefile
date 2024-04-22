@@ -13,14 +13,16 @@ SRCS := main.cpp \
 	./srcs/server/Server.cpp \
 	./srcs/request/Request.cpp srcs/request/RequestUtils.cpp srcs/request/Header.cpp \
 	./srcs/cgi/CgiHandler.cpp \
-	./srcs/Globals.cpp ./srcs/utils.cpp
+	./srcs/Globals.cpp ./srcs/utils.cpp \
+	./srcs/request/Response.cpp
 
 HEADERS := \
 	$(HEADER)/config/GlobalConfig.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/config/DefaultErrors.hpp \
 	$(HEADER)/server/Server.hpp \
 	$(HEADER)/request/Request.hpp $(HEADER)/request/Header.hpp \
 	$(HEADER)/cgi/CgiHandler.hpp \
-	$(HEADER)/Globals.hpp $(HEADER)/utils.hpp
+	$(HEADER)/Globals.hpp $(HEADER)/utils.hpp \
+	$(HEADER)/request/Response.hpp
 
 OBJS := $(addprefix $(OBJDIR),$(SRCS:.cpp=.o))
 

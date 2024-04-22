@@ -4,6 +4,7 @@
 #include "../../includes/Globals.hpp"
 #include "../../includes/utils.hpp"
 #include "../../includes/request/Request.hpp"
+#include "../../includes/request/Response.hpp"
 
 // ************************************************************************************************ //
 
@@ -149,7 +150,8 @@ int Server::run() {
                         std::string request(buffer, bytes_received);
                     
                         Request req(request);
-                        std::string response = req.getResponse();
+                        Response res(req);
+                        std::string response = res.getResponse();
 
                         int bytes_sent = send(fd, response.c_str(), response.size(), 0);
                         if (bytes_sent != static_cast<int>(response.size())){
