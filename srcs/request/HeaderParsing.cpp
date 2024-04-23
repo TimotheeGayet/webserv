@@ -1,81 +1,11 @@
 #include "../../includes/Globals.hpp"
 #include "../../includes/request/Request.hpp"
-
-typedef void (Request::*HandlerFunction)(const std::string&);
-
-std::map<std::string, HandlerFunction> handlers;
-
-void Request::handleHost(const std::string& value)
-{
-    size_t colonPos = value.find(':');
-    std::string host = value.substr(0, colonPos);
-    int port = -1;
-    if (colonPos != std::string::npos)
-        port = stringToLong(value.substr(colonPos + 1));
-
-    const std::vector<ServerConfig>& serverConfigs = g_config.getServerConfigs();
-    std::vector<ServerConfig>::const_iterator it = serverConfigs.begin();
-    std::vector<ServerConfig>::const_iterator end = serverConfigs.end();
-    for (; it != end; ++it)
-    {
-        if (it->getServerName() == host)
-        {
-            this->_server_config = *it;
-            return;
-        }
-        else if (port != -1 && it->getPort() == port)
-        {
-            this->_server_config = *it;
-            return;
-        }
-    }
-    this->_server_config = g_config.getServerConfigs().front();
-}
-
-void Request::handleContentLength(const std::string& value) {
-    if (value.find_first_not_of("0123456789") != std::string::npos)
-        this->_return_code = 400;
-    else if (static_cast<size_t>(stringToLong(value)) > MAX_BODY_SIZE)
-        this->_return_code = 413;
-}
-
-void Request::handleTransferEncoding(const std::string& value) {
-    if (value != "chunked" || value != "identity")
-        this->_return_code = 400;
-}
-
-void Request::handleContentType(const std::string& value) {
-    if (value.find("text/") == std::string::npos && \
-        value.find("image/") == std::string::npos && \
-        value.find("audio/") == std::string::npos && \
-        value.find("video/") == std::string::npos && \
-        value.find("application/") == std::string::npos && \
-        value.find("multipart/") == std::string::npos)
-            this->_return_code = 415;
-    // To complete
-}
-
-void Request::setupHandlers() {
-    handlers["Host"] = &Request::handleHost;
-    handlers["Content-Length"] = &Request::handleContentLength;
-    handlers["Transfer-Encoding"] = &Request::handleTransferEncoding;
-    handlers["Content-Type"] = &Request::handleContentType;
-}
-
-void Request::processHeaders(const std::map<std::string, std::string>& headers) {
-    setupHandlers();
-    std::map<std::string, std::string>::const_iterator it = headers.begin();
-    std::map<std::string, std::string>::const_iterator end = headers.end();
-    for (; it != end; ++it) {
-        std::map<std::string, HandlerFunction>::const_iterator handler = handlers.find(it->first);
-        if (handler != handlers.end()){
-            (this->*handler->second)(it->second);
-        }
-    }
-}
+#include "../../includes/header/Header.hpp"
 
 void Request::headerParsing()
 {
+    HeaderRequest header;
+
     while (this->_req.find("\r\n") != std::string::npos && this->_req.find("\r\n") != 0)
     {
         std::string line = this->_req.substr(0, this->_req.find("\r\n"));
@@ -86,10 +16,25 @@ void Request::headerParsing()
         }
         std::string key = line.substr(0, line.find(": "));
         std::string value = line.substr(line.find(": ") + 2);
-        
-        this->_headers.addHeader(key, value); // Add header to the headers map
+
+        if (key == "Host")
+            header.setHost(value);
+        else if (key == "Accept")
+            header.setAccept(value);
+        else if (key == "User-Agent")
+            header.setUserAgent(value);
+        else if (key == "Connection")
+            header.setConnection(value);
+        else if (this->_method == "POST" || key == "Content-Type")
+            header.setContentType(value);
+        else if (this->_method == "POST" || key == "Content-Length")
+            header.setContentLength(value);
+        else
+        {
+            this->_return_code = 400;
+            throw std::runtime_error("Invalid header key: " + key);
+        }
 
         this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
     }
-    this->processHeaders(this->_headers.getHeaders());
 }
