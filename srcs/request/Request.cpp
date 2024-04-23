@@ -70,7 +70,7 @@ bool Request::isLocation(const std::string& path) {
 	return false;
 }
 
-Location Request::getLocation(const std::string& path) {
+Location Request::findLocation(const std::string& path) {
 	std::vector<Location> locations = this->_server_config.getLocations();
 	for (std::vector<Location>::iterator it = locations.begin(); it != locations.end(); it++)
 	{
@@ -163,17 +163,17 @@ void Request::locationParsing()
 	}
 
 	this->_path.erase(0, location.size());
-	Location loc = getLocation(location);
-	if (loc.getPath() != location)
+	this->_location = findLocation(location);
+	if (this->_location.getPath() != location)
 		this->_path = this->_server_config.getRoot() + this->_path;
 	else
-		this->_path = loc.getRoot() + this->_path;
+		this->_path = this->_location.getRoot() + this->_path;
 
 	if (getResourceType() == "directory" || getResourceType() == "root"){
-		if (loc.getIndex().empty())
+		if (this->_location.getIndex().empty())
 			this->_file = "index.html";
 		else
-			this->_file = loc.getIndex();
+			this->_file = this->_location.getIndex();
 		this->_path += "/" + this->_file;
 	} else if (getResourceType() == "file"){
 		this->_file = this->_path.substr(this->_path.find_last_of('/') + 1);
@@ -189,4 +189,8 @@ std::string Request::getPath() {
 
 ServerConfig Request::getServerConfig() const {
 	return this->_server_config;
+}
+
+Location Request::getLocation() const {
+	return this->_location;
 }
