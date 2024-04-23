@@ -2,7 +2,7 @@
 #define REQUEST_HPP
 
 #include "../Globals.hpp"
-#include "../header/Header.hpp"
+#include "Header.hpp"
 #include <string>
 #include <map>
 
@@ -12,6 +12,7 @@ class Request
 		std::string 			_req;
 		int 					_return_code;
 		ServerConfig 			_server_config;
+		Location				_location;
 
 		// Request parts attributes
 		std::string 			_method; // GET, POST, DELETE
@@ -33,10 +34,10 @@ class Request
 		void 					locationParsing();
 		std::string 			getResourceType();
 		bool 					isLocation(const std::string& path);
-		Location				getLocation(const std::string& path);
+		Location				findLocation(const std::string& path);
 
 		// Headers
-		HeaderRequest 					_headers;
+		Header 					_headers;
 		void					setupHandlers();
 		void					handleHost(const std::string& value);
 		void					handleContentType(const std::string& value);
@@ -56,6 +57,7 @@ class Request
 		std::string 			getPath();
 		int 					getReturnCode() const;
 		ServerConfig 			getServerConfig() const;
+		Location				getLocation() const;
 
 };
 
