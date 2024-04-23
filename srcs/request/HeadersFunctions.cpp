@@ -73,3 +73,23 @@ void Request::processHeaders(const std::map<std::string, std::string>& headers) 
         }
     }
 }
+
+void Request::headerParsing()
+{
+    while (this->_req.find("\r\n") != std::string::npos && this->_req.find("\r\n") != 0)
+    {
+        std::string line = this->_req.substr(0, this->_req.find("\r\n"));
+        if (line.find(": ") == std::string::npos)
+        {
+            this->_return_code = 400;
+            throw std::runtime_error("Invalid header line: " + line);
+        }
+        std::string key = line.substr(0, line.find(": "));
+        std::string value = line.substr(line.find(": ") + 2);
+        
+        this->_headers.addHeader(key, value); // Add header to the headers map
+
+        this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
+    }
+    this->processHeaders(this->_headers.getHeaders());
+}
