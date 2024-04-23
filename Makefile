@@ -11,18 +11,20 @@ OBJDIR := build/
 SRCS := main.cpp \
 	./srcs/config/GlobalConfig.cpp ./srcs/config/ServerConfig.cpp ./srcs/config/Location.cpp ./srcs/config/DefaultErrors.cpp \
 	./srcs/server/Server.cpp \
-	./srcs/request/Request.cpp srcs/request/RequestUtils.cpp srcs/request/Header.cpp \
+	./srcs/request/Request.cpp srcs/request/RequestUtils.cpp ./srcs/request/HeadersFunctions.cpp \
+	./srcs/response/Response.cpp \
+	./srcs/header/Header.cpp \
 	./srcs/cgi/CgiHandler.cpp \
 	./srcs/Globals.cpp ./srcs/utils.cpp \
-	./srcs/request/Response.cpp ./srcs/request/HeadersFunctions.cpp
 
 HEADERS := \
 	$(HEADER)/config/GlobalConfig.hpp $(HEADER)/config/ServerConfig.hpp $(HEADER)/config/Location.hpp $(HEADER)/config/DefaultErrors.hpp \
 	$(HEADER)/server/Server.hpp \
-	$(HEADER)/request/Request.hpp $(HEADER)/request/Header.hpp \
+	$(HEADER)/request/Request.hpp \
+	$(HEADER)/response/Response.hpp \
+	$(HEADER)/header/Header.hpp \
 	$(HEADER)/cgi/CgiHandler.hpp \
 	$(HEADER)/Globals.hpp $(HEADER)/utils.hpp \
-	$(HEADER)/request/Response.hpp
 
 OBJS := $(addprefix $(OBJDIR),$(SRCS:.cpp=.o))
 
@@ -42,6 +44,8 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)srcs/config
 	mkdir -p $(OBJDIR)srcs/server
 	mkdir -p $(OBJDIR)srcs/request
+	mkdir -p $(OBJDIR)srcs/response
+	mkdir -p $(OBJDIR)srcs/header
 	mkdir -p $(OBJDIR)srcs/cgi
 	@echo "\033[1;97mwebserv: \033[1;32mbuild directory done.\n\033[0;m"
 

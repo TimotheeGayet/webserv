@@ -1,14 +1,14 @@
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 
-#include "Header.hpp"
+#include "../header/Header.hpp"
 #include "../Globals.hpp"
-#include "Request.hpp"
+#include "../request/Request.hpp"
 
 class Response {
     private:
         Request& 				_request; // Request object
-        Header 					_headers; // Response headers
+        HeaderResponse 					_headers; // Response headers
         std::string 			_response; // Response body
 
 	public:

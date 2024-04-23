@@ -1,6 +1,6 @@
 #include "../../includes/Globals.hpp"
 #include "../../includes/request/Request.hpp"
-#include "../../includes/request/Header.hpp"
+#include "../../includes/header/Header.hpp"
 #include "../../includes/config/ServerConfig.hpp"
 #include <algorithm>
 #include <sys/stat.h>

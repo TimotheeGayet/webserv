@@ -4,7 +4,7 @@
 #include "../../includes/Globals.hpp"
 #include "../../includes/utils.hpp"
 #include "../../includes/request/Request.hpp"
-#include "../../includes/request/Response.hpp"
+#include "../../includes/response/Response.hpp"
 
 // ************************************************************************************************ //
 

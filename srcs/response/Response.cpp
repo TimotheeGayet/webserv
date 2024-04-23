@@ -1,5 +1,5 @@
 #include "../../includes/Globals.hpp"
-#include "../../includes/request/Response.hpp"
+#include "../../includes/response/Response.hpp"
 
 Response::Response(Request& request) : _request(request), _headers() {}
 
@@ -26,7 +26,7 @@ std::string Response::getResponse() {
 
 	if (!filename.empty()) {
 		extension = filename.substr(filename.find_last_of('.'));
-		if (extension == ".php") {
+		if (extension == ".php" || extension == ".html") {
 			contentType = "text/html";
 		} else if (extension == ".css") {
 			contentType = "text/css";
@@ -38,8 +38,6 @@ std::string Response::getResponse() {
 			contentType = "image/gif";
 		} else if (extension == ".ico") {
 			contentType = "image/x-icon";
-		} else if (extension == ".html") {
-			contentType = "text/html";
 		} else if (extension == ".txt") {
 			contentType = "text/plain";
 		}
