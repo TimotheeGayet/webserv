@@ -2,7 +2,7 @@
 #define REQUEST_HPP
 
 #include "../Globals.hpp"
-#include "Header.hpp"
+#include "../header/Header.hpp"
 #include <string>
 #include <map>
 
@@ -36,7 +36,7 @@ class Request
 		Location				getLocation(const std::string& path);
 
 		// Headers
-		Header 					_headers;
+		HeaderRequest 					_headers;
 		void					setupHandlers();
 		void					handleHost(const std::string& value);
 		void					handleContentType(const std::string& value);
