@@ -26,13 +26,14 @@ class Request
 		std::string 			_query;		// query (key=value&key2=value2)
 		std::string 			_fragment; 	// fragment (#fragment)
 		std::string 			_version; 	// HTTP/1.1
+		HeaderRequest 			_header;
 		std::string 			_body;
 		std::string 			_response;
 
 		// Request parsing methods
 		void 					isValidURI();
 		void					bodyParsing();
-		void					headerParsing();
+		HeaderRequest			headerParsing();
 		std::string 			getResourceType();
 		void 					locationParsing();
 		bool 					isLocation(const std::string& path);
