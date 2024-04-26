@@ -1,7 +1,8 @@
 #include "../../includes/Globals.hpp"
 #include "../../includes/response/Response.hpp"
 
-Response::Response(Request& request) : _request(request), _headers() {}
+// Response::Response(Request& request) : _request(request), _headers() {}
+Response::Response(Request& request) : _request(request) {}
 
 Response::~Response() {}
 
@@ -25,9 +26,9 @@ std::string Response::ErrorResponse()
 	std::string 	err_msg = g_config.getDefaultErrors().getError(err_code);
 	std::string 	err_page = g_config.getDefaultErrors().getErrorPage(err_code); // Default error page
 	Location		location = this->_request.getLocation();
-	
-	if (location.getErrorPages().find(err_code) != location.getErrorPages().end())
-		err_page = location.getErrorPages().find(err_code)->second;
+
+	if (location.getErrorPages().size() != 0 && location.getErrorPages().find(err_code) != location.getErrorPages().end())\
+		err_page = location.getErrorPages().find(err_code)->second; // Custom error page
 
 	// Composing the Error Response
 	std::stringstream ss;

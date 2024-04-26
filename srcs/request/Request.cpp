@@ -4,7 +4,6 @@
 
 Request::Request(const std::string& msg) : _req(msg), _return_code(200){
 	try {
-		std::cout << "\n\nRequest:\n\n" << msg << std::endl;
 		std::stringstream ss(msg);
 		std::string line;
 		std::getline(ss, line);
@@ -41,7 +40,6 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200){
 		isValidURI();
 		headerParsing();
 		locationParsing();
-		std::cout<< "\n\nDone\n\n" << std::endl;
 		bodyParsing();
 	}
 	catch (std::exception &e)

@@ -8,7 +8,7 @@
 class Response {
     private:
         Request& 				_request;   // Request object
-        HeaderResponse 			_headers;   // Response headers
+        // HeaderResponse 			_headers;   // Response headers
         std::string 			_response;  // Response body
 
         std::string 			ErrorResponse(); 

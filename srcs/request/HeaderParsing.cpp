@@ -4,8 +4,6 @@
 
 void Request::headerParsing()
 {
-    HeaderRequest header;
-
     while (this->_req.find("\r\n") != std::string::npos && this->_req.find("\r\n") != 0)
     {
         std::string line = this->_req.substr(0, this->_req.find("\r\n"));
@@ -18,17 +16,19 @@ void Request::headerParsing()
         std::string value = line.substr(line.find(": ") + 2);
 
         if (key == "Host")
-            header.setHost(value);
-        else if (key == "Accept")
-            header.setAccept(value);
-        else if (key == "User-Agent")
-            header.setUserAgent(value);
-        else if (key == "Connection")
-            header.setConnection(value);
+            HeaderRequest::handleHost(value, this->_server_config);
+        // else if (key == "Accept")
+        //     header.setAccept(value);
+        // else if (key == "User-Agent")
+        //     header.setUserAgent(value);
+        // else if (key == "Connection")
+        //     header.setConnection(value);
+        else if (key == "Transfer-Encoding")
+            HeaderRequest::handleTransferEncoding(value, this->_return_code);
         else if (this->_method == "POST" || key == "Content-Type")
-            header.setContentType(value);
+            HeaderRequest::handleContentType(value, this->_return_code);
         else if (this->_method == "POST" || key == "Content-Length")
-            header.setContentLength(value);
+            HeaderRequest::handleContentLength(value, this->_return_code);
         // else
         // {
         //     this->_return_code = 400;
