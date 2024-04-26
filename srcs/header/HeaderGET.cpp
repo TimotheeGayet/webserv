@@ -1,9 +1,4 @@
-#include "../../includes/Globals.hpp"
 #include "../../includes/request/Request.hpp"
-
-typedef void (Request::*HandlerFunction)(const std::string&);
-
-std::map<std::string, HandlerFunction> handlers;
 
 void Request::handleHost(const std::string& value)
 {
@@ -53,23 +48,4 @@ void Request::handleContentType(const std::string& value) {
         value.find("multipart/") == std::string::npos)
             this->_return_code = 415;
     // To complete
-}
-
-void Request::setupHandlers() {
-    handlers["Host"] = &Request::handleHost;
-    handlers["Content-Length"] = &Request::handleContentLength;
-    handlers["Transfer-Encoding"] = &Request::handleTransferEncoding;
-    handlers["Content-Type"] = &Request::handleContentType;
-}
-
-void Request::processHeaders(const std::map<std::string, std::string>& headers) {
-    setupHandlers();
-    std::map<std::string, std::string>::const_iterator it = headers.begin();
-    std::map<std::string, std::string>::const_iterator end = headers.end();
-    for (; it != end; ++it) {
-        std::map<std::string, HandlerFunction>::const_iterator handler = handlers.find(it->first);
-        if (handler != handlers.end()){
-            (this->*handler->second)(it->second);
-        }
-    }
 }

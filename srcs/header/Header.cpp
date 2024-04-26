@@ -1,91 +1,83 @@
 #include "../../includes/header/Header.hpp"
-#include <iostream>
 
-HeaderRequest::HeaderRequest() {
-}
+// Constructors and destructors ------------------------------------------------
 
+HeaderRequest::HeaderRequest() {}
 HeaderRequest::~HeaderRequest() {}
 
-void HeaderRequest::removeHeader(const std::string &key) {
-    _headers.erase(key);
-}
-
-bool HeaderRequest::isSet(const std::string &key) const {
-    return !_headers.at(key).empty();
-}
-
-int HeaderRequest::size() const {
-    return _headers.size();
-}
-
-std::string HeaderRequest::getHeader(const std::string &key) const {
-    return _headers.at(key);
-}
-
-std::map<std::string, std::string> HeaderRequest::getHeaders() const {
-    return _headers;
-}
-
-void HeaderRequest::addHeader(const std::string &key, const std::string &value) {
-    _headers[key] = value;
-}
-
-void HeaderRequest::updateHeader(const std::string &key, const std::string &value) {
-    _headers[key] = value;
-}
-
-int HeaderRequest::getIndex(const std::string &key) const {
-    int index = 0;
-    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); it++) {
-        if (it->first == key)
-            return index;
-        index++;
-    }
-    return -1;
-}
-
-// ************************************************************
-
-HeaderResponse::HeaderResponse() {
-}
-
+HeaderResponse::HeaderResponse() {}
 HeaderResponse::~HeaderResponse() {}
 
-void HeaderResponse::removeHeader(const std::string &key) {
-    _headers.erase(key);
+
+// Request getters and setters -------------------------------------------------
+
+std::string HeaderRequest::getHost() const { return this->_host; }
+std::string HeaderRequest::getAccept() const { return this->_accept; }
+std::string HeaderRequest::getUserAgent() const { return this->_user_agent; }
+std::string HeaderRequest::getConnection() const { return this->_connection; }
+std::string HeaderRequest::getContentType() const { return this->_content_type; }
+std::string HeaderRequest::getContentLength() const { return this->_content_length; }
+
+void HeaderRequest::setHost(const std::string& host)
+{
+    this->_host = host;
 }
 
-bool HeaderResponse::isSet(const std::string &key) const {
-    return !_headers.at(key).empty();
+void HeaderRequest::setAccept(const std::string& accept)
+{
+    this->_accept = accept;
 }
 
-int HeaderResponse::size() const {
-    return _headers.size();
+void HeaderRequest::setUserAgent(const std::string& user_agent)
+{
+    this->_user_agent = user_agent;
 }
 
-std::string HeaderResponse::getHeader(const std::string &key) const {
-    return _headers.at(key);
+void HeaderRequest::setConnection(const std::string& connection)
+{
+    this->_connection = connection;
 }
 
-std::map<std::string, std::string> HeaderResponse::getHeaders() const {
-    return _headers;
+void HeaderRequest::setContentType(const std::string& content_type)
+{
+    this->_content_type = content_type;
 }
 
-void HeaderResponse::addHeader(const std::string &key, const std::string &value) {
-    _headers[key] = value;
+void HeaderRequest::setContentLength(const std::string& content_length)
+{
+    this->_content_length = content_length;
 }
 
-void HeaderResponse::updateHeader(const std::string &key, const std::string &value) {
-    _headers[key] = value;
+
+// Response getters and setters ------------------------------------------------
+
+std::string HeaderResponse::getDate() const { return this->_date; }
+std::string HeaderResponse::getServer() const { return this->_server; }
+std::string HeaderResponse::getConnection() const { return this->_connection; }
+std::string HeaderResponse::getContentType() const { return this->_content_type; }
+std::string HeaderResponse::getContentLength() const { return this->_content_length; }
+
+void HeaderResponse::setServer(const std::string& server)
+{
+    this->_server = server;
 }
 
-int HeaderResponse::getIndex(const std::string &key) const {
-    int index = 0;
-    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); it++) {
-        if (it->first == key)
-            return index;
-        index++;
-    }
-    return -1;
+void HeaderResponse::setDate(const std::string& date)
+{
+    this->_date = date;
 }
 
+void HeaderResponse::setContentType(const std::string& content_type)
+{
+    this->_content_type = content_type;
+}
+
+void HeaderResponse::setContentLength(const std::string& content_length)
+{
+    this->_content_length = content_length;
+}
+
+void HeaderResponse::setConnection(const std::string& connection)
+{
+    this->_connection = connection;
+}

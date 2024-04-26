@@ -18,7 +18,33 @@ std::string getCurrentTime()
 	return std::string(buffer);
 }
 
-std::string Response::getResponse() {
+std::string Response::ErrorResponse()
+{
+	ServerConfig 	server = this->_request.getServerConfig();
+	int 			err_code = this->_request.getReturnCode();
+	std::string 	err_msg = g_config.getDefaultErrors().getError(err_code);
+	std::string 	err_page = g_config.getDefaultErrors().getErrorPage(err_code); // Default error page
+	Location		location = this->_request.getLocation();
+	
+	if (location.getErrorPages().find(err_code) != location.getErrorPages().end())
+		err_page = location.getErrorPages().find(err_code)->second;
+
+	// Composing the Error Response
+	std::stringstream ss;
+	ss << "HTTP/1.1 " << err_msg << "\r\n";
+	ss << "Server: " << server.getServerName() << "\r\n";
+	ss << "Date: " << getCurrentTime() << "\r\n";
+	ss << "Connection: close\r\n";
+	ss << "Content-Type: text/html\r\n";
+	ss << "Content-Length: " << err_page.length() << "\r\n";
+	ss << "\r\n";
+	ss << err_page;
+	
+	return ss.str();
+}
+
+std::string Response::getResponse()
+{
 	std::string path = this->_request.getServerConfig().getRoot() + this->_request.getPath();
 	std::string filename = this->_request.getFile();
 	std::string contentType = "text/html";
@@ -44,33 +70,8 @@ std::string Response::getResponse() {
 	}
 
 	std::ifstream file(path.c_str());
-	if (!file.is_open() || !file.good() || this->_request.getReturnCode() != 200)
-	{
-		std::stringstream ss;
-		ss << "HTTP/1.1" << this->_request.getReturnCode() << " " << g_config.getDefaultErrors().getError(this->_request.getReturnCode()) << "\r\n";
-		ss << "Server: serveur_du_web\r\nDate: " << getCurrentTime() << "\r\n";
-
-		// Check if the Error pages have been redefined
-		if (this->_request.getLocation().getErrorPages().find(this->_request.getReturnCode()) != this->_request.getLocation().getErrorPages().end())
-		{
-			ss << "Content-Length: " << this->_request.getLocation().getErrorPages().find(this->_request.getReturnCode())->second.length() << "\r\n";
-			ss << "Connection: close\r\n\r\n";
-			ss << this->_request.getLocation().getErrorPages().find(this->_request.getReturnCode())->second + "\r\n";
-		}
-		else if (this->_request.getServerConfig().getErrorPages().find(this->_request.getReturnCode()) != this->_request.getServerConfig().getErrorPages().end())
-		{
-			ss << "Content-Length: " << this->_request.getServerConfig().getErrorPages().find(this->_request.getReturnCode())->second.length() << "\r\n";
-			ss << "Connection: close\r\n\r\n";
-			ss << this->_request.getServerConfig().getErrorPages().find(this->_request.getReturnCode())->second + "\r\n";
-		}
-		else
-		{
-			ss << "Content-Length: " << g_config.getDefaultErrors().getErrorPage(this->_request.getReturnCode()).length() << "\r\n";
-			ss << "Connection: close\r\n\r\n";
-			ss << g_config.getDefaultErrors().getErrorPage(this->_request.getReturnCode()) + "\r\n";
-		}
-		return ss.str();
-	}
+	if (!file.is_open() || this->_request.getReturnCode() != 200)
+		return ErrorResponse();
 
 	std::string line;
 	while (std::getline(file, line) && !file.eof())
