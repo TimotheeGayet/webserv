@@ -1,7 +1,6 @@
 #include "../../includes/Globals.hpp"
 #include "../../includes/response/Response.hpp"
 
-// Response::Response(Request& request) : _request(request), _headers() {}
 Response::Response(Request& request) : _request(request) {}
 
 Response::~Response() {}

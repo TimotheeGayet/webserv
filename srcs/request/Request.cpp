@@ -38,7 +38,7 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200){
 			throw std::runtime_error("Not Implemented: " + line);
 		}
 		isValidURI();
-		headerParsing();
+		this->_header = headerParsing();
 		locationParsing();
 		bodyParsing();
 	}

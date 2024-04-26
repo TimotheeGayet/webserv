@@ -21,6 +21,8 @@ static long stringToLong(const std::string& str) {
     return sign * result;
 }
 
+HeaderRequest::HeaderRequest() : _content_length(0) {}
+
 void HeaderRequest::handleHost(const std::string& value, ServerConfig& server_config)
 {
     size_t colonPos = value.find(':');
