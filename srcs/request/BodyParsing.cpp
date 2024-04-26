@@ -2,7 +2,16 @@
 
 void Request::bodyParsing()
 {
-    // this -> _body = this->_req.substr(this->_req.find("\r\n") + 2);
+    this -> _body = this->_req.substr(this->_req.find("\r\n") + 2);
+
+    // Returns an error if there is a body with the GET/DELETE method
+    if (this->_body.empty() && (this->_method == "GET" || this->_method == "DELETE")){
+        this->_return_code = 400;
+        throw std::runtime_error("Error: GET/DELETE method with body");
+    } else if (this->_body.empty()){
+        return;
+    }
+    
     // if (this->_headers.getHeader("Content-Length") == "")
     // {
     //     this->_return_code = 411;

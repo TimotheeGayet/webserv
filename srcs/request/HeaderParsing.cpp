@@ -23,8 +23,8 @@ void Request::headerParsing()
         //     header.setUserAgent(value);
         // else if (key == "Connection")
         //     header.setConnection(value);
-        else if (key == "Transfer-Encoding")
-            HeaderRequest::handleTransferEncoding(value, this->_return_code);
+        else if (this->_method == "POST" || key == "Transfer-Encoding")
+            HeaderRequest::handleTransferEncoding(value, this->_return_code, this->_req, this->_body);
         else if (this->_method == "POST" || key == "Content-Type")
             HeaderRequest::handleContentType(value, this->_return_code);
         else if (this->_method == "POST" || key == "Content-Length")

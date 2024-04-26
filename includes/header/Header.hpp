@@ -13,7 +13,7 @@ class HeaderRequest {
 	public:
 		static void handleHost(const std::string& value, ServerConfig& server_config);
 		static void handleContentLength(const std::string& value, int& return_code);
-		static void handleTransferEncoding(const std::string& value, int& return_code);
+		static void handleTransferEncoding(const std::string& value, int& return_code, const std::string& request, std::string& body);
 		static void handleContentType(const std::string& value, int& return_code);
 };
 

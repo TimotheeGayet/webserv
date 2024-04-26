@@ -60,7 +60,7 @@ void HeaderRequest::handleContentLength(const std::string& value, int& return_co
 }
 
 void HeaderRequest::handleTransferEncoding(const std::string& value, int& return_code) {
-    if (value != "chunked" || value != "identity") {
+    if (value != "chunked" && value != "identity") {
         return_code = 400;
         throw std::runtime_error("Invalid Transfer-Encoding: " + value);
     }
