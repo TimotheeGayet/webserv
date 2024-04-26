@@ -23,6 +23,8 @@ static long stringToLong(const std::string& str) {
 
 HeaderRequest::HeaderRequest() : _content_length(0) {}
 
+HeaderRequest::~HeaderRequest() {}
+
 void HeaderRequest::handleHost(const std::string& value, ServerConfig& server_config)
 {
     size_t colonPos = value.find(':');
@@ -79,4 +81,25 @@ void HeaderRequest::handleContentType(const std::string& value, int& return_code
             throw std::runtime_error("Unsupported Media Type: " + value);
         }
     // To complete
+}
+
+
+int HeaderRequest::getContentLength() const {
+    return this->_content_length;
+}
+
+std::string HeaderRequest::getConnection() const {
+    return this->_connection;
+}
+
+std::string HeaderRequest::getContentType() const {
+    return this->_content_type;
+}
+
+std::string HeaderRequest::getTransferEncoding() const {
+    return this->_transfer_encoding;
+}
+
+std::vector<std::string> HeaderRequest::getAccept() const {
+    return this->_accept;
 }
