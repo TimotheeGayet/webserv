@@ -3,6 +3,7 @@
 #include <string>
 
 Request::Request(const std::string& msg) : _req(msg), _return_code(200){
+
 	try {
 		std::stringstream ss(msg);
 		std::string line;
@@ -49,3 +50,7 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200){
 }
 
 Request::~Request() {}
+
+HeaderRequest Request::getHeader() const {
+	return this->_header;
+}

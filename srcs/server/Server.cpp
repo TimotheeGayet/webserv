@@ -148,19 +148,32 @@ int Server::run() {
                     } else {
                         // data received -> handle the HTTP request
                         std::string request(buffer, bytes_received);
-                    
+
                         Request req(request);
                         Response res(req);
                         std::string response = res.getResponse();
 
-                        int bytes_sent = send(fd, response.c_str(), response.size(), 0);
-                        if (bytes_sent != static_cast<int>(response.size())){
-                            std::cerr << "error: send" << std::endl;
+                        // Check the connection type
+                        if (req.getHeader().getConnection() == "close") {
+                            int bytes_sent = send(fd, response.c_str(), response.size(), 0);
+                            if (bytes_sent != static_cast<int>(response.size())){
+                                std::cerr << "error: send" << std::endl;
+                            }
                             close(fd);
                             epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
-                        } else {
+                            std::cout << "Connection closed" << std::endl;
+                        }
+                        else if (req.getHeader().getConnection() == "keep-alive") {
+                            int bytes_sent = send(fd, response.c_str(), response.size(), 0);
+                            if (bytes_sent != static_cast<int>(response.size())){
+                                std::cerr << "error: send" << std::endl;
+                            }
+                        }
+                         else {
+                            std::cerr << "Invalid Connection: " << req.getHeader().getConnection() << std::endl;
                             close(fd);
                             epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+
                         }
                     }
                 }

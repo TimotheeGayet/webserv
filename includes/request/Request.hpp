@@ -49,6 +49,7 @@ class Request
 		int 					getReturnCode() const;
 		ServerConfig 			getServerConfig() const;
 		Location				getLocation() const;
+		HeaderRequest 			getHeader() const;
 
 };
 

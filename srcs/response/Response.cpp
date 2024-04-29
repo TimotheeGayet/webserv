@@ -5,6 +5,19 @@ Response::Response(Request& request) : _request(request) {}
 
 Response::~Response() {}
 
+static bool isContentTypeAccepted(const std::vector<AcceptElement>& acceptElements, const std::string& contentType) {
+	for (std::vector<AcceptElement>::const_iterator it = acceptElements.begin(); it != acceptElements.end(); ++it) {
+		std::string type = it->typeMIME.substr(0, it->typeMIME.find('/'));
+		std::string subtype = it->typeMIME.substr(it->typeMIME.find('/') + 1);
+
+		if ((type == "*" && subtype == "*") || 
+			(type == contentType.substr(0, contentType.find('/')) && (subtype == "*" || subtype == contentType.substr(contentType.find('/') + 1)))) {
+				return true;
+		}
+	}
+	return false;
+}
+
 std::string getCurrentTime()
 {
 	time_t rawtime;
@@ -18,10 +31,9 @@ std::string getCurrentTime()
 	return std::string(buffer);
 }
 
-std::string Response::ErrorResponse()
+std::string Response::ErrorResponse(int err_code)
 {
 	ServerConfig 	server = this->_request.getServerConfig();
-	int 			err_code = this->_request.getReturnCode();
 	std::string 	err_msg = g_config.getDefaultErrors().getError(err_code);
 	std::string 	err_page = g_config.getDefaultErrors().getErrorPage(err_code); // Default error page
 	Location		location = this->_request.getLocation();
@@ -43,12 +55,16 @@ std::string Response::ErrorResponse()
 	return ss.str();
 }
 
+
+
 std::string Response::getResponse()
 {
 	std::string path = this->_request.getServerConfig().getRoot() + this->_request.getPath();
 	std::string filename = this->_request.getFile();
 	std::string contentType = "text/html";
 	std::string extension;
+	HeaderRequest header = this->_request.getHeader();
+	std::vector<AcceptElement> accept = header.getAccept();
 
 	if (!filename.empty()) {
 		extension = filename.substr(filename.find_last_of('.'));
@@ -69,13 +85,29 @@ std::string Response::getResponse()
 		}
 	}
 
-	std::ifstream file(path.c_str());
-	if (!file.is_open() || this->_request.getReturnCode() != 200)
-		return ErrorResponse();
+	if (!isContentTypeAccepted(accept, contentType)) {
+		// Send a 406 Not Acceptable response
+		std::cout << "Not Acceptable -> " << contentType << std::endl << std::endl;
+	} 
 
-	std::string line;
-	while (std::getline(file, line) && !file.eof())
-		this->_response += line + "\n";
+	std::ifstream file(path.c_str());
+	if (!file.is_open())
+	{
+		std::cout << "File not found -> " << path << std::endl << std::endl;
+		if (this->_request.getLocation().getAutoindex())
+			this->_response = generate_listing_html(path);
+		else
+			return ErrorResponse(404);
+	}
+	else if (this->_request.getReturnCode() != 200) {
+		return ErrorResponse(this->_request.getReturnCode());
+	}
+	else {
+		std::string line;
+		while (std::getline(file, line) && !file.eof())
+			this->_response += line + "\n";
+	}
+
 
 	std::stringstream ss;
 	ss << "HTTP/1.1 200 OK\r\n";
@@ -88,3 +120,8 @@ std::string Response::getResponse()
 	ss << this->_response;
 	return ss.str();
 }
+
+
+
+
+//handle listing, accept contenttype
