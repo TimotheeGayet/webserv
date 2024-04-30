@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <fstream>
 
 class Location {
     public:

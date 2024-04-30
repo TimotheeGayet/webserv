@@ -32,6 +32,22 @@ static std::map<int, std::string> get_error_pages(const std::string &value) {
         std::string page = token.substr(pos + 1);
         errorPages[code] = page;
     }
+
+    
+    for (std::map<int, std::string>::iterator it = errorPages.begin(); it != errorPages.end(); ++it) {
+        std::ifstream file;
+        std::string file_content;
+        file.open(it->second.c_str());
+        if (!file.is_open()) {
+            throw std::runtime_error("Error: '" + it->second + "' is not a valid Error page.");
+        }
+        std::string line;
+        while (std::getline(file, line) && !file.eof()) {
+            file_content += line;
+        }
+        file.close();
+        it->second = file_content;
+    }
     return errorPages;
 }
 

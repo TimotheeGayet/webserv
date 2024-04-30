@@ -39,9 +39,15 @@ std::string Response::ErrorResponse(int err_code)
 	std::string 	err_page = g_config.getDefaultErrors().getErrorPage(err_code); // Default error page
 	Location		location = this->_request.getLocation();
 
-	// If the location has a custom error page, use it
-	if (location.getErrorPages().size() != 0 && location.getErrorPages().find(err_code) != location.getErrorPages().end())\
+	// If the location or the server has a custom error page, use it (location has priority)
+	if (server.getErrorPages().size() != 0 && server.getErrorPages().find(err_code) != server.getErrorPages().end())
+	{
+		err_page = server.getErrorPages().find(err_code)->second;
+	}
+	if (location.getErrorPages().size() != 0 && location.getErrorPages().find(err_code) != location.getErrorPages().end())
+	{
 		err_page = location.getErrorPages().find(err_code)->second;
+	}
 
 	// Composing the Error Response
 	std::stringstream ss;
