@@ -74,6 +74,29 @@ std::string Response::ErrorResponse(int err_code)
 	return ss.str();
 }
 
+std::string detectContentType(const std::string& filename) {
+	std::string extension;
+	if (filename.find_last_of(".") != std::string::npos)
+		extension = filename.substr(filename.find_last_of("."));
+	if (extension == ".php") {
+		return "text/html";
+	} else if (extension == ".html") {
+		return "text/html";
+	} else if (extension == ".css") {
+		return "text/css";
+	} else if (extension == ".jpg" || extension == ".jpeg") {
+		return "image/jpeg";
+	} else if (extension == ".png") {
+		return "image/png";
+	} else if (extension == ".gif") {
+		return "image/gif";
+	} else if (extension == ".ico") {
+		return "image/x-icon";
+	} else {
+		return "text/plain";
+	}
+}
+
 std::string Response::getResponse()
 {
 	if (this->_request.getReturnCode() != 200) {
@@ -81,34 +104,10 @@ std::string Response::getResponse()
 	}
 
 	std::string path = this->_request.getServerConfig().getRoot() + this->_request.getPath();
-	std::string filename = this->_request.getFile();
-	std::string contentType = "text/html";
-	std::string extension;
+	std::string contentType = detectContentType(this->_request.getPath());
 	std::string code = "200 OK";
 	HeaderRequest header = this->_request.getHeader();
 	std::vector<AcceptElement> accept = header.getAccept();
-
-	if (!filename.empty()) {
-		extension = filename.substr(filename.find_last_of('.'));
-		if (extension == ".php") {
-			this->_response = CgiHandler::execute_cgi(path);
-			contentType = "text/html";
-		} else if (extension == ".html") {
-			contentType = "text/html";
-		} else if (extension == ".css") {
-			contentType = "text/css";
-		} else if (extension == ".jpg" || extension == ".jpeg") {
-			contentType = "image/jpeg";
-		} else if (extension == ".png") {
-			contentType = "image/png";
-		} else if (extension == ".gif") {
-			contentType = "image/gif";
-		} else if (extension == ".ico") {
-			contentType = "image/x-icon";
-		} else {
-			contentType = "text/plain";
-		}
-	}
 
 	if (!isContentTypeAccepted(accept, contentType)) {
 		return ErrorResponse(406);
