@@ -55,11 +55,16 @@ void    Location::setLocationParam(const std::string key, const std::string valu
         this->setAutoindex(value);
     }
     else if (key == "path") {
-        this->setPath(value);
+        if (value[value.size() - 1] == '/' && value.size() > 1){
+            this->setPath(value.substr(0, value.size() - 1));
+        }
+        else {
+            this->setPath(value);
+        }
     }
     else if (key == "root") {
-        if (value[value.size() - 1] != '/') {
-            this->setRoot(value + "/");
+        if (value[value.size() - 1] == '/' && value.size() > 1){
+            this->setRoot(value.substr(0, value.size() - 1));
         }
         else {
             this->setRoot(value);

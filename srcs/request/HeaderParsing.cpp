@@ -19,10 +19,10 @@ HeaderRequest Request::headerParsing()
 
         if (key == "Host")
             header.handleHost(value, this->_server_config);
-        // else if (key == "Accept")
-        //     header.setAccept(value);
-        // else if (key == "Connection")
-        //     header.setConnection(value);
+        else if (key == "Accept")
+            header.handleAccept(value);
+        else if (key == "Connection")
+            header.handleConnection(value);
         else if (this->_method == "POST" || key == "Transfer-Encoding")
             header.handleTransferEncoding(value, this->_return_code);
         else if (this->_method == "POST" || key == "Content-Type")

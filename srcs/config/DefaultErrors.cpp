@@ -8,6 +8,7 @@ DefaultErrors::DefaultErrors():
     _403("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>403 Forbidden</title></head><body><h1>403 Forbidden</h1><p>You don't have permission to access this resource.</p></body></html>"),
     _404("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>404 Not Found</title></head><body><h1>404 Not Found</h1><p>The requested URL was not found on this server.</p></body></html>"),
     _405("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>405 Method Not Allowed</title></head><body><h1>405 Method Not Allowed</h1><p>The method specified in the request is not allowed for the resource.</p></body></html>"),
+    _406("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>406 Not Acceptable</title></head><body><h1>406 Not Acceptable</h1><p>The server cannot generate a response that is acceptable according to the request's Accept headers.</p></body></html>"),
     _408("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>408 Request Timeout</title></head><body><h1>408 Request Timeout</h1><p>The server timed out waiting for the request.</p></body></html>"),
     _410("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>410 Gone</title></head><body><h1>410 Gone</h1><p>The requested resource is no longer available and will not be available again.</p></body></html>"),
     _411("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>411 Length Required</title></head><body><h1>411 Length Required</h1><p>The request did not specify the length of its content, which is required by the requested resource.</p></body></html>"),
@@ -39,6 +40,8 @@ std::string DefaultErrors::getError(int code) {
             return "404 Not Found";
         case 405:
             return "405 Method Not Allowed";
+        case 406:
+            return "406 Not Acceptable";
         case 408:
             return "408 Request Timeout";
         case 410:
@@ -88,6 +91,8 @@ std::string DefaultErrors::getErrorPage(int code) {
             return this->_404;
         case 405:
             return this->_405;
+        case 406:
+            return this->_406;
         case 408:
             return this->_408;
         case 410:
