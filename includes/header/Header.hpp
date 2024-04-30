@@ -18,28 +18,25 @@ struct AcceptElement {
 
 class HeaderRequest {
 	private:
-		int							_content_length;
-		std::string 				_connection;
-		std::string 				_content_type;
-		std::string 				_transfer_encoding;
 		std::vector<AcceptElement>	_accept;
+		std::string 				_connection;
+		int							_content_length;
+		std::string 				_transfer_encoding;
 
 	public:
 		HeaderRequest();
 		~HeaderRequest();
 
-		void 						handleHost(const std::string& value, ServerConfig& server_config);
 		void 						handleAccept(const std::string& value);
 		void 						handleConnection(const std::string& value);
 		void 						handleContentLength(const std::string& value, int& return_code);
+		void 						handleHost(const std::string& value, ServerConfig& server_config);
 		void 						handleTransferEncoding(const std::string& value, int& return_code);
-		void 						handleContentType(const std::string& value, int& return_code);
 
-		int 						getContentLength() const;
-		std::string					getConnection() const;
-		std::string					getContentType() const;
-		std::string					getTransferEncoding() const;
 		std::vector<AcceptElement>	getAccept() const;
+		std::string					getConnection() const;
+		int 						getContentLength() const;
+		std::string					getTransferEncoding() const;
 
 };
 

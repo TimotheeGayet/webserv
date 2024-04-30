@@ -23,11 +23,9 @@ HeaderRequest Request::headerParsing()
             header.handleAccept(value);
         else if (key == "Connection")
             header.handleConnection(value);
-        else if (this->_method == "POST" || key == "Transfer-Encoding")
+        else if (this->_method == "POST" && key == "Transfer-Encoding")
             header.handleTransferEncoding(value, this->_return_code);
-        else if (this->_method == "POST" || key == "Content-Type")
-            header.handleContentType(value, this->_return_code);
-        else if (this->_method == "POST" || key == "Content-Length")
+        else if (this->_method == "POST" && key == "Content-Length")
             header.handleContentLength(value, this->_return_code);
         
 

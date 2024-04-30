@@ -19,7 +19,7 @@ unsigned long HexaStrToLong(const std::string& str)
 
 void Request::bodyParsing()
 {
-    this -> _body = this->_req.substr(this->_req.find("\r\n") + 2);
+    this->_body = this->_req.substr(this->_req.find("\r\n") + 2);
 
     // Returns an error if there is a body with the GET/DELETE method
     if (this->_method == "GET" || this->_method == "DELETE")

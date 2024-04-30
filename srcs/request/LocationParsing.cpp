@@ -25,6 +25,41 @@ Location Request::findLocation(const std::string& path) {
 	return Location();
 }
 
+void Request::resolveDirectoryPath()
+{
+    _file = _location.getIndex(); // Default index file in the location config
+
+    if (_file.empty())
+    {
+        _file = "index.html"; // if no default index
+    }
+
+    if (_path[_path.size() - 1] != '/')
+    {
+        _path += "/";
+    }
+
+    _path += _file;
+}
+
+void Request::resolvePath()
+{
+	_ressource_type = getResourceType(_path.c_str());
+
+    if (_ressource_type == "directory" || _ressource_type == "root")
+    {
+        resolveDirectoryPath();
+    }
+    else if (_ressource_type == "file")
+    {
+        _file = _path.substr(_path.find_last_of('/') + 1); // Get the file name of the path
+    }
+    else if (_method != "POST")
+    {
+        _return_code = 404;
+    	throw std::runtime_error("Resource not found: " + _path);
+    }
+}
 
 void Request::locationParsing()
 {
@@ -65,18 +100,5 @@ void Request::locationParsing()
 		this->_path.replace(pos, 2, "/");
 	}
 
-	if (getResourceType() == "directory" || getResourceType() == "root"){
-		if (this->_location.getIndex().empty())
-			this->_file = "index.html";
-		else
-			this->_file = this->_location.getIndex();
-		if (this->_path[this->_path.size() - 1] != '/')
-			this->_path += "/";
-		this->_path += this->_file;
-	} else if (getResourceType() == "file") {
-		this->_file = this->_path.substr(this->_path.find_last_of('/') + 1);
-	} else {
-		this->_return_code = 404;
-		throw std::runtime_error("Resource not found: " + this->_path);
-	}
+	resolvePath();
 }

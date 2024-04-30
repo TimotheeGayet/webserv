@@ -84,6 +84,7 @@ std::string Response::getResponse()
 	std::string filename = this->_request.getFile();
 	std::string contentType = "text/html";
 	std::string extension;
+	std::string code = "200 OK";
 	HeaderRequest header = this->_request.getHeader();
 	std::vector<AcceptElement> accept = header.getAccept();
 
@@ -104,7 +105,7 @@ std::string Response::getResponse()
 			contentType = "image/gif";
 		} else if (extension == ".ico") {
 			contentType = "image/x-icon";
-		} else if (extension == ".txt") {
+		} else {
 			contentType = "text/plain";
 		}
 	}
@@ -127,8 +128,11 @@ std::string Response::getResponse()
 			this->_response += line + "\n";
 	}
 
+	if (this->_request.getMethod() == "POST")
+		code = "201 Created";
+
 	std::stringstream ss;
-	ss << "HTTP/1.1 200 OK\r\n";
+	ss << "HTTP/1.1 " << code << "\r\n";
 	ss << "Server: serveur_du_web\r\n";
 	ss << "Date: " << getCurrentTime() << "\r\n";
 	ss << "Connection: " << header.getConnection() << "\r\n";

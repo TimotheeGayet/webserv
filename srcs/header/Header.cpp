@@ -1,6 +1,6 @@
 #include "../../includes/header/Header.hpp"
 
-HeaderRequest::HeaderRequest() : _content_length(0), _transfer_encoding("identity") {}
+HeaderRequest::HeaderRequest() : _connection("close"), _content_length(0), _transfer_encoding("identity") {}
 
 HeaderRequest::~HeaderRequest() {}
 
@@ -106,7 +106,7 @@ void HeaderRequest::handleContentLength(const std::string& value, int& return_co
         return_code = 411;
         throw std::runtime_error("Content-Length is 0");
     }
-    
+
     this->_content_length = stringToLong(value);
 }
 
@@ -119,32 +119,12 @@ void HeaderRequest::handleTransferEncoding(const std::string& value, int& return
     this->_transfer_encoding = value;
 }
 
-void HeaderRequest::handleContentType(const std::string& value, int& return_code) {
-    if (value != "audio/mpeg" && value != "audio/ogg" && \
-        value != "video/mp4" && value != "video/webm" && value != "video/ogg" && \
-        value != "image/jpeg" && value != "image/png" && value != "image/gif" && \
-        value != "text/html" && value != "text/css" && value != "text/javascript" && \
-        value != "multipart/orm-data" && value != "application/x-www-form-urlencoded" && \
-        value != "application/json" && value != "application/xml" && value != "application/octet-stream")
-    {
-            return_code = 415;
-            throw std::runtime_error("Unsupported Media Type: " + value);
-    }
-
-    this->_content_type = value;
-}
-
-
 int HeaderRequest::getContentLength() const {
     return this->_content_length;
 }
 
 std::string HeaderRequest::getConnection() const {
     return this->_connection;
-}
-
-std::string HeaderRequest::getContentType() const {
-    return this->_content_type;
 }
 
 std::string HeaderRequest::getTransferEncoding() const {

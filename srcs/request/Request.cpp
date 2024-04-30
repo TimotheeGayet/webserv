@@ -42,6 +42,8 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200){
 		this->_header = headerParsing();
 		locationParsing();
 		bodyParsing();
+		if (this->_method == "POST")
+			uploadFile();
 	}
 	catch (std::exception &e)
 	{

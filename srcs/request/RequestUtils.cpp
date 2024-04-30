@@ -1,14 +1,11 @@
-#include "../../includes/Globals.hpp"
 #include "../../includes/request/Request.hpp"
-#include "../../includes/header/Header.hpp"
-#include "../../includes/config/ServerConfig.hpp"
-#include <algorithm>
 #include <sys/stat.h>
+#include <algorithm>
 #include <string>
 
-std::string Request::getResourceType() {
+std::string Request::getResourceType(const char *path) {
     struct stat fileStat;
-    if (stat(this->_path.c_str(), &fileStat) == 0) {
+    if (stat(path, &fileStat) == 0) {
         if (S_ISREG(fileStat.st_mode)) {
             return "file";
         } else if (S_ISDIR(fileStat.st_mode)) {
@@ -16,7 +13,7 @@ std::string Request::getResourceType() {
         }
     }
 
-    if (this->_path == "/")
+    if (std::string(path) == "/")
         return "root";
     return "unknown";
 }
@@ -57,4 +54,8 @@ std::string Request::getPath() {
 
 ServerConfig Request::getServerConfig() const {
 	return this->_server_config;
+}
+
+std::string Request::getMethod() const {
+    return this->_method;
 }
