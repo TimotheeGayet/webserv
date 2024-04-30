@@ -2,9 +2,19 @@
 #include "../../includes/cgi/CgiHandler.hpp"
 #include "../../includes/response/Response.hpp"
 
-Response::Response(Request& request) : _request(request) {}
+Response::Response(Request& request) : _request(request), _status_code(200) {}
 
 Response::~Response() {}
+
+int Response::getStatusCode()
+{
+	return this->_status_code;
+}
+
+void Response::setStatusCode(int status_code)
+{
+	this->_status_code = status_code;
+}
 
 static bool isContentTypeAccepted(const std::vector<AcceptElement>& acceptElements, const std::string& contentType) {
 	for (std::vector<AcceptElement>::const_iterator it = acceptElements.begin(); it != acceptElements.end(); ++it) {
@@ -53,12 +63,17 @@ std::string Response::ErrorResponse(int err_code)
 	ss << "Content-Length: " << err_page.length() << "\r\n";
 	ss << "\r\n";
 	ss << err_page;
-	
+
+	this->setStatusCode(err_code);
 	return ss.str();
 }
 
 std::string Response::getResponse()
 {
+	if (this->_request.getReturnCode() != 200) {
+		return ErrorResponse(this->_request.getReturnCode());
+	}
+
 	std::string path = this->_request.getServerConfig().getRoot() + this->_request.getPath();
 	std::string filename = this->_request.getFile();
 	std::string contentType = "text/html";
@@ -95,14 +110,10 @@ std::string Response::getResponse()
 	std::ifstream file(path.c_str());
 	if (!file.is_open())
 	{
-		std::cout << "File not found -> " << path << std::endl << std::endl;
 		if (this->_request.getLocation().getAutoindex())
 			this->_response = generate_listing_html(path);
 		else
 			return ErrorResponse(404);
-	}
-	else if (this->_request.getReturnCode() != 200) {
-		return ErrorResponse(this->_request.getReturnCode());
 	}
 	else {
 		std::string line;
@@ -110,15 +121,15 @@ std::string Response::getResponse()
 			this->_response += line + "\n";
 	}
 
-
 	std::stringstream ss;
 	ss << "HTTP/1.1 200 OK\r\n";
 	ss << "Server: serveur_du_web\r\n";
 	ss << "Date: " << getCurrentTime() << "\r\n";
-	ss << "Connection: keep-alive\r\n";
+	ss << "Connection: " << header.getConnection() << "\r\n";
 	ss << "Content-Type: " << contentType << "\r\n";
 	ss << "Content-Length: " << this->_response.length() << "\r\n";
 	ss << "\r\n";
 	ss << this->_response;
+
 	return ss.str();
 }

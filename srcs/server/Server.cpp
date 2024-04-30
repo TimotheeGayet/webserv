@@ -154,7 +154,7 @@ int Server::run() {
                         std::string response = res.getResponse();
 
                         // Check the connection type
-                        if (req.getHeader().getConnection() == "close") {
+                        if (req.getHeader().getConnection() == "close" || req.getReturnCode() != 200 || res.getStatusCode() != 200) {
                             int bytes_sent = send(fd, response.c_str(), response.size(), 0);
                             if (bytes_sent != static_cast<int>(response.size())){
                                 std::cerr << "error: send" << std::endl;
@@ -168,6 +168,7 @@ int Server::run() {
                             if (bytes_sent != static_cast<int>(response.size())){
                                 std::cerr << "error: send" << std::endl;
                             }
+
                         }
                          else {
                             std::cerr << "Invalid Connection: " << req.getHeader().getConnection() << std::endl;

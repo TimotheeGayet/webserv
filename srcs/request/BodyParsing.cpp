@@ -34,10 +34,10 @@ void Request::bodyParsing()
 
     // Content-Length checking
     size_t max_size = MAX_BODY_SIZE;
+    if (this->_server_config.getClientMaxBodySize() != "0")
+        max_size = stringToLong(this->_server_config.getClientMaxBodySize());
     if (this->_location.getClientMaxBodySize() != "0")
         max_size = stringToLong(this->_location.getClientMaxBodySize());
-    else if (this->_server_config.getClientMaxBodySize() != "0")
-        max_size = stringToLong(this->_server_config.getClientMaxBodySize());
 
     if (this->_header.getContentLength() > 0)
     {

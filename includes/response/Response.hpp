@@ -16,6 +16,7 @@ class Response {
         Request& 				_request;   // Request object
         std::string 			_response;  // Response body
         std::string 			_header;    // Response header
+        int                     _status_code; // Response status code
 
         std::string 			ErrorResponse(int err_code); 
 
@@ -23,6 +24,8 @@ class Response {
         Response( Request& request );
         ~Response();
 
+        int                     getStatusCode();
+        void                    setStatusCode(int status_code);
         Request& 				getRequest();
 		std::string 			getResponse();
         std::string             generate_listing_html(const std::string &dir_path);
