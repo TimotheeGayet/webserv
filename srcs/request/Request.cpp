@@ -45,7 +45,7 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200){
 	}
 	catch (std::exception &e)
 	{
-		std::cerr << "webserv: Error: " << e.what() << std::endl << std::endl;
+		std::cerr << "webserv: Error: " << e.what() << std::endl;
 	}
 }
 

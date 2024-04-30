@@ -139,7 +139,7 @@ int Server::run() {
                         // no data received -> client disconnected or error
                         
                         if (bytes_received == 0) {
-                            std::cout << "Client disconnected" << std::endl;
+                            std::cout << "Client disconnected" << std::endl << std::endl;
                         } else {
                             std::cerr << "error: recv" << std::endl;
                         }
@@ -161,7 +161,7 @@ int Server::run() {
                             }
                             close(fd);
                             epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
-                            std::cout << "Connection closed" << std::endl;
+                            std::cout << "Connection closed" << std::endl << std::endl;
                         }
                         else if (req.getHeader().getConnection() == "keep-alive") {
                             int bytes_sent = send(fd, response.c_str(), response.size(), 0);
@@ -171,7 +171,7 @@ int Server::run() {
 
                         }
                          else {
-                            std::cerr << "Invalid Connection: " << req.getHeader().getConnection() << std::endl;
+                            std::cerr << "Invalid Connection: " << req.getHeader().getConnection() << std::endl << std::endl;
                             close(fd);
                             epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
 
