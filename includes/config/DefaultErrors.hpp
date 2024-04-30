@@ -19,6 +19,7 @@ class DefaultErrors {
         const std::string &get405() const { return _405; }
         const std::string &get408() const { return _408; }
         const std::string &get410() const { return _410; }
+        const std::string &get411() const { return _411; }
         const std::string &get413() const { return _413; }
         const std::string &get414() const { return _414; }
         const std::string &get415() const { return _415; }
@@ -41,6 +42,7 @@ class DefaultErrors {
         const std::string _405;
         const std::string _408;
         const std::string _410;
+        const std::string _411;
         const std::string _413;
         const std::string _414;
         const std::string _415;

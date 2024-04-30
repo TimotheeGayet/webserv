@@ -1,4 +1,5 @@
 #include "../../includes/Globals.hpp"
+#include "../../includes/cgi/CgiHandler.hpp"
 #include "../../includes/response/Response.hpp"
 
 Response::Response(Request& request) : _request(request) {}
@@ -21,13 +22,14 @@ std::string getCurrentTime()
 std::string Response::ErrorResponse()
 {
 	ServerConfig 	server = this->_request.getServerConfig();
-	int 			err_code = this->_request.getReturnCode();
-	std::string 	err_msg = g_config.getDefaultErrors().getError(err_code);
-	std::string 	err_page = g_config.getDefaultErrors().getErrorPage(err_code); // Default error page
-	Location		location = this->_request.getLocation();
+	int 			err_code = this->_request.getReturnCode(); 
+	std::string 	err_msg = g_config.getDefaultErrors().getError(err_code); 
+	std::string 	err_page = g_config.getDefaultErrors().getErrorPage(err_code); // Default error page of the server
+	Location		location = this->_request.getLocation(); 
 
+	// If the location has a custom error page, use it
 	if (location.getErrorPages().size() != 0 && location.getErrorPages().find(err_code) != location.getErrorPages().end())\
-		err_page = location.getErrorPages().find(err_code)->second; // Custom error page
+		err_page = location.getErrorPages().find(err_code)->second;
 
 	// Composing the Error Response
 	std::stringstream ss;
@@ -49,10 +51,21 @@ std::string Response::getResponse()
 	std::string filename = this->_request.getFile();
 	std::string contentType = "text/html";
 	std::string extension;
+	std::ifstream file(path.c_str());
+
+	if (!file.is_open() || this->_request.getReturnCode() != 200)
+		return ErrorResponse();
+
+	std::string line;
+	while (std::getline(file, line) && !file.eof())
+		this->_response += line + "\n";
 
 	if (!filename.empty()) {
 		extension = filename.substr(filename.find_last_of('.'));
-		if (extension == ".php" || extension == ".html") {
+		if (extension == ".php") {
+			this->_response = CgiHandler::execute_cgi(path);
+			contentType = "text/html";
+		} else if (extension == ".html") {
 			contentType = "text/html";
 		} else if (extension == ".css") {
 			contentType = "text/css";
@@ -68,14 +81,6 @@ std::string Response::getResponse()
 			contentType = "text/plain";
 		}
 	}
-
-	std::ifstream file(path.c_str());
-	if (!file.is_open() || this->_request.getReturnCode() != 200)
-		return ErrorResponse();
-
-	std::string line;
-	while (std::getline(file, line) && !file.eof())
-		this->_response += line + "\n";
 
 	std::stringstream ss;
 	ss << "HTTP/1.1 200 OK\r\n";

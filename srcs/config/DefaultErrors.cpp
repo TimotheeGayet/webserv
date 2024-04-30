@@ -10,6 +10,7 @@ DefaultErrors::DefaultErrors():
     _405("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>405 Method Not Allowed</title></head><body><h1>405 Method Not Allowed</h1><p>The method specified in the request is not allowed for the resource.</p></body></html>"),
     _408("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>408 Request Timeout</title></head><body><h1>408 Request Timeout</h1><p>The server timed out waiting for the request.</p></body></html>"),
     _410("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>410 Gone</title></head><body><h1>410 Gone</h1><p>The requested resource is no longer available and will not be available again.</p></body></html>"),
+    _411("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>411 Length Required</title></head><body><h1>411 Length Required</h1><p>The request did not specify the length of its content, which is required by the requested resource.</p></body></html>"),
     _413("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>413 Payload Too Large</title></head><body><h1>413 Payload Too Large</h1><p>The request payload is too large for the server to process.</p></body></html>"),
     _414("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>414 URI Too Long</title></head><body><h1>414 URI Too Long</h1><p>The URI provided in the request is too long for the server to process.</p></body></html>"),
     _415("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>415 Unsupported Media Type</title></head><body><h1>415 Unsupported Media Type</h1><p>The server does not support the media type of the request.</p></body></html>"),
@@ -42,6 +43,8 @@ std::string DefaultErrors::getError(int code) {
             return "408 Request Timeout";
         case 410:
             return "410 Gone";
+        case 411:
+            return "411 Length Required";
         case 413:
             return "413 Payload Too Large";
         case 414:
@@ -89,6 +92,8 @@ std::string DefaultErrors::getErrorPage(int code) {
             return this->_408;
         case 410:
             return this->_410;
+        case 411:
+            return this->_411;
         case 413:
             return this->_413;
         case 414:

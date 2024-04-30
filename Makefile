@@ -15,6 +15,7 @@ SRCS := main.cpp \
 	./srcs/response/Response.cpp \
 	./srcs/header/Header.cpp \
 	./srcs/cgi/CgiHandler.cpp \
+	./srcs/cgi/FileData.cpp \
 	./srcs/Globals.cpp ./srcs/utils.cpp \
 
 HEADERS := \
@@ -24,6 +25,7 @@ HEADERS := \
 	$(HEADER)/response/Response.hpp \
 	$(HEADER)/header/Header.hpp \
 	$(HEADER)/cgi/CgiHandler.hpp \
+	$(HEADER)/cgi/FileData.hpp \
 	$(HEADER)/Globals.hpp $(HEADER)/utils.hpp \
 
 OBJS := $(addprefix $(OBJDIR),$(SRCS:.cpp=.o))

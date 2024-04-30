@@ -29,11 +29,6 @@ HeaderRequest Request::headerParsing()
             header.handleContentType(value, this->_return_code);
         else if (this->_method == "POST" || key == "Content-Length")
             header.handleContentLength(value, this->_return_code);
-        // else
-        // {
-        //     this->_return_code = 400;
-        //     throw std::runtime_error("Invalid header key: " + key);
-        // }
 
         this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
     }
