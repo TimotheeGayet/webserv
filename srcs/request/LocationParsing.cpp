@@ -59,6 +59,7 @@ void Request::locationParsing()
 			this->_path = this->_location.getRoot() + "/" + this->_path.substr(location.size());
 		}
 	}
+
 	std::string::size_type pos = 0;
 	while ((pos = this->_path.find("//", pos)) != std::string::npos) {
 		this->_path.replace(pos, 2, "/");
