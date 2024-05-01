@@ -29,6 +29,7 @@ class Request
 		std::string 			_version; 			// HTTP/1.1
 		HeaderRequest 			_header;
 		std::string 			_body;
+		bool 					_do_redirect;
 		std::string 			_response;
 
 		// Request parsing methods
@@ -55,6 +56,7 @@ class Request
 		Location				getLocation() const;
 		HeaderRequest 			getHeader() const;
 		std::string 			getMethod() const;
+		bool 					getDoRedirect() const;
 
 };
 

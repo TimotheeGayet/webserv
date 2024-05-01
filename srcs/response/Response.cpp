@@ -74,6 +74,17 @@ std::string Response::ErrorResponse(int err_code)
 	return ss.str();
 }
 
+std::string Response::Redirect(HeaderRequest& header) {
+	std::stringstream ss;
+	ss << "HTTP/1.1 301 Moved Permanently\r\n";
+	ss << "Server: serveur_du_web\r\n";
+	ss << "Location: " << this->_request.getLocation().getRedirectUrl() << "\r\n";
+	ss << "Date: " << getCurrentTime() << "\r\n";
+	ss << "Connection: " << header.getConnection() << "\r\n";
+	ss << "\r\n";
+	return ss.str();
+}
+
 std::string detectContentType(const std::string& filename) {
 	std::string extension;
 	if (filename.find_last_of(".") != std::string::npos)
@@ -99,15 +110,20 @@ std::string detectContentType(const std::string& filename) {
 
 std::string Response::getResponse()
 {
-	if (this->_request.getReturnCode() != 200) {
-		return ErrorResponse(this->_request.getReturnCode());
-	}
-
+	HeaderRequest header = this->_request.getHeader();
 	std::string path = this->_request.getServerConfig().getRoot() + this->_request.getPath();
 	std::string contentType = detectContentType(this->_request.getPath());
 	std::string code = "200 OK";
-	HeaderRequest header = this->_request.getHeader();
 	std::vector<AcceptElement> accept = header.getAccept();
+
+	// Redirection :
+	if (this->_request.getDoRedirect() == true) {
+		return Redirect(header);
+	}
+
+	if (this->_request.getReturnCode() != 200) {
+		return ErrorResponse(this->_request.getReturnCode());
+	}
 
 	if (!isContentTypeAccepted(accept, contentType)) {
 		return ErrorResponse(406);
@@ -116,7 +132,9 @@ std::string Response::getResponse()
 	std::ifstream file(path.c_str());
 	if (!file.is_open())
 	{
-		if (this->_request.getLocation().getAutoindex())
+		if (this->_request.getLocation().getRedirectUrl() != "")
+			return Redirect(header);
+		else if (this->_request.getLocation().getAutoindex())
 			this->_response = generate_listing_html(path);
 		else
 			return ErrorResponse(404);

@@ -2,7 +2,7 @@
 #include "../../includes/Globals.hpp"
 #include <string>
 
-Request::Request(const std::string& msg) : _req(msg), _return_code(200){
+Request::Request(const std::string& msg) : _req(msg), _return_code(200), _do_redirect(false) {
 
 	try {
 		std::stringstream ss(msg);
@@ -55,4 +55,8 @@ Request::~Request() {}
 
 HeaderRequest Request::getHeader() const {
 	return this->_header;
+}
+
+bool Request::getDoRedirect() const {
+	return this->_do_redirect;
 }

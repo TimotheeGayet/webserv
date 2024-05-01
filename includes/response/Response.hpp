@@ -18,7 +18,8 @@ class Response {
         std::string 			_header;    // Response header
         int                     _status_code; // Response status code
 
-        std::string 			ErrorResponse(int err_code); 
+        std::string 			ErrorResponse(int err_code);
+        std::string             Redirect(HeaderRequest& header);
 
 	public:
         Response( Request& request );
