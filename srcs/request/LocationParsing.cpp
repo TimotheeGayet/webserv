@@ -57,13 +57,19 @@ void Request::resolvePath()
     else if (_method != "POST")
     {
         _return_code = 404;
+
+		if (_location.getRedirectUrl().empty() == false) {
+			_do_redirect = true;
+		}
     	throw std::runtime_error("Resource not found: " + _path);
     }
 }
 
 void Request::locationParsing()
 {
+	std::string asked_path = this->_path;
 	std::string location = this->_path;
+
 	
 	while (isLocation(location) == false) {
 		location = location.substr(0, location.find_last_of('/'));
@@ -79,6 +85,11 @@ void Request::locationParsing()
 	};
 
 	this->_location = findLocation(location);
+
+	if (asked_path == this->_location.getPath() && \
+		this->_location.getRedirectUrl().empty() == false) {
+		this->_do_redirect = true;
+	}
 
 	if (location == this->_path) {
 		if (this->_location.getRoot().empty()) {

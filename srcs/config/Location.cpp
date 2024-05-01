@@ -110,7 +110,7 @@ void    Location::setLocationParam(const std::string key, const std::string valu
         }
     }
     else {
-        throw std::runtime_error("Unknown key in location : " + key);
+        throw std::runtime_error("Unknown key in location : " + key + ". Keys allowed are 'autoindex', 'path', 'root', 'index', 'redirect_url', 'client_body_temp_path', 'client_max_body_size', 'allowed_methods' and 'error_pages'.");
     }
 }
 

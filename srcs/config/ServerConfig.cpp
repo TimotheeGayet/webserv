@@ -139,7 +139,7 @@ void ServerConfig::parseServerConfig(const std::string& line) {
         }
     }
     else {
-        throw std::runtime_error("Unknown key in server GlobalConfiguration : " + key);
+        throw std::runtime_error("Unknown key in server GlobalConfiguration : " + key + ". Keys allowed are 'listen', 'root', 'server_name', 'client_max_body_size' and 'error_pages'.");
     }
 }
 
