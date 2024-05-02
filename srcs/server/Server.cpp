@@ -155,7 +155,7 @@ int Server::run() {
 
                         // Check the connection type
                         if (req.getHeader().getConnection() == "close" || req.getReturnCode() != 200 || \
-                            res.getStatusCode() != 200 || req.getDoRedirect()) {
+                            res.getStatusCode() != 200 || req.getDoRedirect() == true) {
                             int bytes_sent = send(fd, response.c_str(), response.size(), 0);
                             if (bytes_sent != static_cast<int>(response.size())){
                                 std::cerr << "error: send" << std::endl;

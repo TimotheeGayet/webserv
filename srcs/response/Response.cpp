@@ -81,6 +81,7 @@ std::string Response::Redirect(HeaderRequest& header) {
 	ss << "Location: " << this->_request.getLocation().getRedirectUrl() << "\r\n";
 	ss << "Date: " << getCurrentTime() << "\r\n";
 	ss << "Connection: " << header.getConnection() << "\r\n";
+	ss << "Cache-Control: no-cache\r\n";
 	ss << "\r\n";
 	return ss.str();
 }
@@ -133,8 +134,11 @@ std::string Response::getResponse()
 	if (!file.is_open())
 	{
 		if (this->_request.getLocation().getRedirectUrl().empty() == false)
+		{
+			this->_request.setDoRedirect(true);
 			return Redirect(header);
-		else if (this->_request.getLocation().getAutoindex())
+		}
+		if (this->_request.getLocation().getAutoindex())
 			this->_response = generate_listing_html(path);
 		else
 			return ErrorResponse(404);

@@ -56,6 +56,7 @@ class Request
 		Location				getLocation() const;
 		HeaderRequest 			getHeader() const;
 		std::string 			getMethod() const;
+		void					setDoRedirect(bool do_redirect);
 		bool 					getDoRedirect() const;
 
 };
