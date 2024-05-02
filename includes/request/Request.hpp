@@ -46,7 +46,7 @@ class Request
 		Location				findLocation(const std::string& path);
 
 		// File utils
-		void 					getFileContent(std::ifstream file);
+		void 					getFileContent();
 		void 					uploadFile();
 		void 					deleteFile();
 
@@ -64,6 +64,7 @@ class Request
 		void					setDoRedirect(bool do_redirect);
 		bool 					getDoRedirect() const;
 		std::string 			getInitialPath() const;
+		std::string 			getResponse() const;
 
 };
 

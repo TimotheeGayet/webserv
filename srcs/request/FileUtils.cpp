@@ -1,11 +1,12 @@
 #include "../../includes/request/Request.hpp"
 
-void Request::getFileContent(std::ifstream file)
+void Request::getFileContent()
 {
+	std::ifstream file(this->_path.c_str());
     std::string line;
     while (std::getline(file, line))
     {
-        this->_body += line + "\n";
+        this->_response += line + "\n";
     }
 }
 
@@ -16,7 +17,7 @@ void Request::uploadFile()
         this->_return_code = 400;
         throw std::runtime_error("Bad Request: cannot upload file to a directory");
     }
-    
+
     std::string path_to_file = this->_path.substr(0, this->_path.find_last_of('/'));
 
     // Check if the path to the file exists

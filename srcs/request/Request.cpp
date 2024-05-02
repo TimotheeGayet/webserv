@@ -2,6 +2,21 @@
 #include "../../includes/Globals.hpp"
 #include <string>
 
+void checkMethod(const std::string method, int &return_code, std::vector<std::string> allowed_methods) {
+	if (method != "GET" && method != "POST" && method != "DELETE")
+	{
+		return_code = 405;
+		throw std::runtime_error("Method Not Allowed: " + method);
+	}
+	for (std::vector<std::string>::iterator it = allowed_methods.begin(); it != allowed_methods.end(); it++)
+	{
+		if (*it == method)
+			return;
+	}
+	return_code = 405;
+	throw std::runtime_error("Method Not Allowed by location: " + method);
+}
+
 Request::Request(const std::string& msg) : _req(msg), _return_code(200), _do_redirect(false) {
 
 	try {
@@ -33,19 +48,15 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200), _do_red
 			this->_return_code = 505;
 			throw std::runtime_error("HTTP Version Not Supported: " + first_line);
 		}
-		if (this->_method != "GET" && this->_method != "POST" && this->_method != "DELETE")
-		{
-			this->_return_code = 501;
-			throw std::runtime_error("Not Implemented: " + first_line);
-		}
 
 		isValidURI();
 		this->_header = headerParsing();
 		locationParsing();
+		checkMethod(this->_method, this->_return_code, this->_location.getAllowedMethods());
 		bodyParsing();
 
 		if (this->_method == "GET")
-			getFile();
+			getFileContent();
 		else if (this->_method == "POST")
 			uploadFile();
 		else if (this->_method == "DELETE")

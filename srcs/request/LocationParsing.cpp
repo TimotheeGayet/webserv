@@ -1,9 +1,5 @@
 #include "../../includes/request/Request.hpp"
 
-Location Request::getLocation() const {
-	return this->_location;
-}
-
 bool Request::isLocation(const std::string& path) {
 	std::vector<Location> locations = this->_server_config.getLocations();
 	for (std::vector<Location>::iterator it = locations.begin(); it != locations.end(); it++)
@@ -72,7 +68,6 @@ void Request::locationParsing()
 	std::string asked_path = this->_path;
 	std::string location = this->_path;
 
-	
 	while (isLocation(location) == false) {
 		location = location.substr(0, location.find_last_of('/'));
 		if (location.empty())

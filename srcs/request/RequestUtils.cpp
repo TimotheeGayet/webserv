@@ -63,3 +63,11 @@ std::string Request::getMethod() const {
 std::string Request::getInitialPath() const {
     return this->_initial_path;
 }
+
+Location Request::getLocation() const {
+    return this->_location;
+}
+
+std::string Request::getResponse() const {
+    return this->_response;
+}

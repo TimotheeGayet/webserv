@@ -2,7 +2,7 @@
 #include "../../includes/cgi/CgiHandler.hpp"
 #include "../../includes/response/Response.hpp"
 
-Response::Response(Request& request) : _request(request), _status_code(_request.getReturnCode()) {}
+Response::Response(Request& request) : _request(request), _response(_request.getResponse()), _status_code(_request.getReturnCode()) {}
 
 Response::~Response() {}
 
