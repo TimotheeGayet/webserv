@@ -68,6 +68,9 @@ SocketInfo Server::initializeSocket(u_int16_t port) {
 }
 
 int Server::run() {
+
+    std::vector<std::string> requests(10, "");
+
     epoll_fd = epoll_create(1);
     if (epoll_fd == -1) {
         std::cerr << "error: epoll_create" << std::endl;
@@ -146,12 +149,19 @@ int Server::run() {
                         close(fd);
                         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
                     } else {
-                        // data received -> handle the HTTP request
+                        // data received -> append request part and handle the HTTP request if complete
                         std::string request(buffer, bytes_received);
+                        requests[i] = requests[i] + request;
 
-                        Request req(request);
+                        if (requests[i].find("\r\n\r\n") == std::string::npos) {
+                            continue;
+                        }
+
+                        Request req(requests[i]);
                         Response res(req);
                         std::string response = res.getResponse();
+                        
+                        requests[i] = "";
 
                         // Check the connection type
                         if (req.getHeader().getConnection() == "close" || req.getReturnCode() != 200 || \

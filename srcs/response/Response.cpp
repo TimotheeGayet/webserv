@@ -126,7 +126,7 @@ std::string Response::getResponse()
 		return ErrorResponse(this->_request.getReturnCode());
 	}
 
-	if (!isContentTypeAccepted(accept, contentType)) {
+	if (!isContentTypeAccepted(accept, contentType) && accept.size() != 0) {
 		return ErrorResponse(406);
 	} 
 
