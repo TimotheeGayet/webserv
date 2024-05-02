@@ -139,7 +139,7 @@ std::string Response::getResponse()
 			return Redirect(header);
 		}
 		if (this->_request.getLocation().getAutoindex())
-			this->_response = generate_listing_html(path);
+			this->_response = generate_listing_html();
 		else
 			return ErrorResponse(404);
 	}

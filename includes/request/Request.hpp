@@ -21,6 +21,7 @@ class Request
 		std::string 			_uri; 				// method://host:port/path/to/file?query#fragment
 		std::string 			_host; 				// www.example.com
 		u_int16_t 				_port; 				// 80
+		std::string 			_initial_path; 		// /path/to/file
 		std::string 			_path; 				// /path/to/file
 		std::string 			_file; 				// file.ext
 		std::string 			_ressource_type;	// "directory", "file", "root", ""
@@ -58,6 +59,7 @@ class Request
 		std::string 			getMethod() const;
 		void					setDoRedirect(bool do_redirect);
 		bool 					getDoRedirect() const;
+		std::string 			getInitialPath() const;
 
 };
 

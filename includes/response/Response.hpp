@@ -29,7 +29,7 @@ class Response {
         void                    setStatusCode(int status_code);
         Request& 				getRequest();
 		std::string 			getResponse();
-        std::string             generate_listing_html(const std::string &dir_path);
+        std::string             generate_listing_html();
 };
 
 #endif
