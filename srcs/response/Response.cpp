@@ -132,7 +132,7 @@ std::string Response::getResponse()
 	std::ifstream file(path.c_str());
 	if (!file.is_open())
 	{
-		if (this->_request.getLocation().getRedirectUrl() != "")
+		if (this->_request.getLocation().getRedirectUrl().empty() == false)
 			return Redirect(header);
 		else if (this->_request.getLocation().getAutoindex())
 			this->_response = generate_listing_html(path);
