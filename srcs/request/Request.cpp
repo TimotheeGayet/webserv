@@ -66,3 +66,7 @@ HeaderRequest Request::getHeader() const {
 bool Request::getDoRedirect() const {
 	return this->_do_redirect;
 }
+
+void Request::setDoRedirect(bool do_redirect) {
+	this->_do_redirect = do_redirect;
+}

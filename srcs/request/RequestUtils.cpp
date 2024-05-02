@@ -59,3 +59,7 @@ ServerConfig Request::getServerConfig() const {
 std::string Request::getMethod() const {
     return this->_method;
 }
+
+std::string Request::getInitialPath() const {
+    return this->_initial_path;
+}

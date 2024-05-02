@@ -1,23 +1,32 @@
 #include "../../includes/response/Response.hpp"
 
-static std::string create_link(const std::string &name, bool is_dir) {
+static std::string create_link(std::string path_dir, const std::string &name, bool is_dir) {
+    std::string last;
+    if (path_dir[path_dir.size() - 1] != '/') {
+        last = path_dir.substr(path_dir.find_last_of('/') + 1) + "/";
+    } else {
+        last = "";
+    }
     std::string link = "<a href=\"";
+    link += last;
     link += name;
     if (is_dir) {
-        link += "/\""; 
-    } else {
-        link += "\"";
+        link += "/"; 
     }
-    link += ">";
+    link += "\">";
+    link += path_dir;
+    if (last != "")
+        link += "/";
     link += name;
     link += "</a>";
     return link;
 }
 
-std::string Response::generate_listing_html(const std::string &dir_path) {
+std::string Response::generate_listing_html() {
 
-    std::string new_path = dir_path.substr(0, dir_path.find_last_of('/'));
-    std::string html = "<html><body><h1>Listing du r&eacute;pertoire : ";
+    std::string new_path = this->_request.getInitialPath();
+    std::cout << "new_path: " << new_path << std::endl;
+    std::string html = "<html><body><h1>Listing : ";
     html += new_path;
     html += "</h1><ul>";
 
@@ -25,7 +34,7 @@ std::string Response::generate_listing_html(const std::string &dir_path) {
     
     DIR *dir = opendir(new_path.c_str());
     if (!dir) {
-        html += "<p>Erreur : Impossible d'ouvrir le r&eacute;pertoire.</p>";
+        html += "<p>Error : Cannot open the directory.</p>";
         html += "</body></html>";
         return html;
     }
@@ -39,7 +48,7 @@ std::string Response::generate_listing_html(const std::string &dir_path) {
         bool is_dir = (entry->d_type == DT_DIR);
         
         html += "<li>";
-        html += create_link(entry->d_name, is_dir);
+        html += create_link(new_path, entry->d_name, is_dir);
         html += "</li>";
     }
     

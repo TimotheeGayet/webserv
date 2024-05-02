@@ -34,11 +34,13 @@ void Request::resolveDirectoryPath()
         _file = "index.html"; // if no default index
     }
 
+	_initial_path = _path;
+
     if (_path[_path.size() - 1] != '/')
     {
         _path += "/";
     }
-
+	
     _path += _file;
 }
 
