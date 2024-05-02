@@ -105,6 +105,9 @@ int Server::run() {
 
             for (int i = 0; i < nfds; ++i) {
                 int fd = events[i].data.fd;
+                if (requests.find(fd) == requests.end()) {
+                    requests[fd] = "";
+                }
 
                 // Find the port associated with the file descriptor
                 u_int16_t port = 0;
@@ -162,7 +165,7 @@ int Server::run() {
                         Response res(req);
                         std::string response = res.getResponse();
                         
-                        requests[i] = "";
+                        requests[fd] = "";
 
                         // Check the connection type
                         if (req.getHeader().getConnection() == "close" || \
@@ -181,7 +184,7 @@ int Server::run() {
                             if (bytes_sent != static_cast<int>(response.size())){
                                 std::cerr << "error: send" << std::endl;
                             }
-
+                            requests.erase(fd);                        
                         }
                          else {
                             std::cerr << "Invalid Connection: " << req.getHeader().getConnection() << std::endl << std::endl;
