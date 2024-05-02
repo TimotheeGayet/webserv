@@ -69,7 +69,7 @@ SocketInfo Server::initializeSocket(u_int16_t port) {
 
 int Server::run() {
 
-    std::vector<std::string> requests(10, "");
+    std::map<int, std::string> requests;
 
     epoll_fd = epoll_create(1);
     if (epoll_fd == -1) {
@@ -148,16 +148,17 @@ int Server::run() {
                         }
                         close(fd);
                         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+                        requests.erase(fd);
                     } else {
                         // data received -> append request part and handle the HTTP request if complete
                         std::string request(buffer, bytes_received);
-                        requests[i] = requests[i] + request;
+                        requests[fd] = requests[fd] + request;
 
-                        if (requests[i].find("\r\n\r\n") == std::string::npos) {
+                        if (requests[fd].find("\r\n\r\n") == std::string::npos) {
                             continue;
                         }
 
-                        Request req(requests[i]);
+                        Request req(requests[fd]);
                         Response res(req);
                         std::string response = res.getResponse();
                         
@@ -172,6 +173,7 @@ int Server::run() {
                             }
                             close(fd);
                             epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+                            requests.erase(fd);
                             std::cout << "Connection closed" << std::endl << std::endl;
                         }
                         else if (req.getHeader().getConnection() == "keep-alive") {
@@ -184,6 +186,7 @@ int Server::run() {
                          else {
                             std::cerr << "Invalid Connection: " << req.getHeader().getConnection() << std::endl << std::endl;
                             close(fd);
+                            requests.erase(fd);
                             epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
 
                         }

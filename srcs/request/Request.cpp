@@ -8,6 +8,8 @@ void checkMethod(const std::string method, int &return_code, std::vector<std::st
 		return_code = 405;
 		throw std::runtime_error("Method Not Allowed: " + method);
 	}
+	if (allowed_methods.empty())
+		return;
 	for (std::vector<std::string>::iterator it = allowed_methods.begin(); it != allowed_methods.end(); it++)
 	{
 		if (*it == method)
