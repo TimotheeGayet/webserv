@@ -34,7 +34,6 @@ class Request
 
 		// Request parsing methods
 		void 					isValidURI();
-		void 					uploadFile();
 		void 					resolvePath();
 		void					bodyParsing();
 		HeaderRequest			headerParsing();
@@ -44,6 +43,11 @@ class Request
 		bool 					isLocation(const std::string& path);
 		long 					stringToLong(const std::string& str);
 		Location				findLocation(const std::string& path);
+
+		// File utils
+		void 					getFileContent(std::ifstream file);
+		void 					uploadFile();
+		void 					deleteFile();
 
 	public:
 		Request(const std::string &msg);

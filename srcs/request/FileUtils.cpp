@@ -1,5 +1,14 @@
 #include "../../includes/request/Request.hpp"
 
+void Request::getFileContent(std::ifstream file)
+{
+    std::string line;
+    while (std::getline(file, line))
+    {
+        this->_body += line + "\n";
+    }
+}
+
 void Request::uploadFile()
 {
     if (this->_ressource_type == "directory")
@@ -37,4 +46,25 @@ void Request::uploadFile()
     file.close();
 
     this->_file = this->_path.substr(this->_path.find_last_of('/') + 1);
+}
+
+void Request::deleteFile()
+{
+    if (this->_ressource_type == "directory" || this->_ressource_type == "root")
+    {
+        this->_return_code = 400;
+        throw std::runtime_error("Bad Request: cannot delete a directory");
+    }
+
+    if (getResourceType(this->_path.c_str()) == "unknown")
+    {
+        this->_return_code = 404;
+        throw std::runtime_error("Not Found: " + this->_path);
+    }
+
+    if (std::remove(this->_path.c_str()) != 0)
+    {
+        this->_return_code = 500;
+        throw std::runtime_error("Internal Server Error: cannot delete file");
+    }
 }

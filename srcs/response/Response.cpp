@@ -2,7 +2,7 @@
 #include "../../includes/cgi/CgiHandler.hpp"
 #include "../../includes/response/Response.hpp"
 
-Response::Response(Request& request) : _request(request), _status_code(200) {}
+Response::Response(Request& request) : _request(request), _status_code(_request.getReturnCode()) {}
 
 Response::~Response() {}
 
@@ -82,6 +82,8 @@ std::string Response::Redirect(HeaderRequest& header) {
 	ss << "Date: " << getCurrentTime() << "\r\n";
 	ss << "Connection: " << header.getConnection() << "\r\n";
 	ss << "\r\n";
+
+	this->setStatusCode(301);
 	return ss.str();
 }
 
@@ -116,7 +118,6 @@ std::string Response::getResponse()
 	std::string code = "200 OK";
 	std::vector<AcceptElement> accept = header.getAccept();
 
-	// Redirection :
 	if (this->_request.getDoRedirect() == true) {
 		return Redirect(header);
 	}
@@ -139,14 +140,15 @@ std::string Response::getResponse()
 		else
 			return ErrorResponse(404);
 	}
-	else {
-		std::string line;
-		while (std::getline(file, line) && !file.eof())
-			this->_response += line + "\n";
-	}
 
 	if (this->_request.getMethod() == "POST")
+	{
 		code = "201 Created";
+	}
+	else if (this->_request.getMethod() == "DELETE")
+	{
+		code = "204 No Content";
+	}
 
 	std::stringstream ss;
 	ss << "HTTP/1.1 " << code << "\r\n";

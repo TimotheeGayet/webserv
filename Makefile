@@ -11,7 +11,7 @@ OBJDIR := build/
 SRCS := main.cpp \
 	./srcs/config/GlobalConfig.cpp ./srcs/config/ServerConfig.cpp ./srcs/config/Location.cpp ./srcs/config/DefaultErrors.cpp \
 	./srcs/server/Server.cpp \
-	./srcs/request/Request.cpp srcs/request/RequestUtils.cpp ./srcs/request/HeaderParsing.cpp ./srcs/request/LocationParsing.cpp ./srcs/request/UriParsing.cpp ./srcs/request/BodyParsing.cpp ./srcs/request/UploadFile.cpp \
+	./srcs/request/Request.cpp srcs/request/RequestUtils.cpp ./srcs/request/HeaderParsing.cpp ./srcs/request/LocationParsing.cpp ./srcs/request/UriParsing.cpp ./srcs/request/BodyParsing.cpp ./srcs/request/FileUtils.cpp \
 	./srcs/response/Response.cpp ./srcs/response/Listing.cpp \
 	./srcs/header/Header.cpp \
 	./srcs/cgi/CgiHandler.cpp \
