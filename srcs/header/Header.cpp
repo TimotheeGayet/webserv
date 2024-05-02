@@ -81,9 +81,6 @@ void HeaderRequest::handleAccept(const std::string& value) {
         }
         this->_accept.push_back(parseAcceptElement(element));
     }
-    // for (std::vector<AcceptElement>::iterator it = this->_accept.begin(); it != this->_accept.end(); ++it) {
-    //     std::cout << "Type MIME: " << it->typeMIME << ", Qualité: " << it->quality << std::endl;
-    // }
 }
 
 
