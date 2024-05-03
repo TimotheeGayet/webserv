@@ -101,7 +101,7 @@ static std::string getExtension(const std::string& filename) {
 
 std::string detectContentType(const std::string& filename) {
 	std::string extension = getExtension(filename);
-	if (extension == ".bla") {
+	if (extension == ".php") {
 		return "text/html";
 	} else if (extension == ".html") {
 		return "text/html";
@@ -154,7 +154,7 @@ std::string Response::getResponse()
 			return ErrorResponse(404);
 	}
 
-	if (getExtension(this->_request.getPath()) == ".bla")
+	if (getExtension(this->_request.getPath()) == ".php")
 	{
 		this->_response = CgiHandler::execute_cgi(this->_request.getPath());
 	}

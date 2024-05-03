@@ -94,7 +94,7 @@ int Server::run() {
 
     while (true) {
         try {
-            struct epoll_event events[10]; // 10 events max
+            struct epoll_event events[100]; // 100 events max
 
             int nfds = epoll_wait(epoll_fd, events, 10, -1);
             if (nfds == -1) {

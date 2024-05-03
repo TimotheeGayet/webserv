@@ -64,6 +64,9 @@ void Request::bodyParsing()
     size_t end_pos = 0;
     size_t chunk_size = 0;
 
+    if (this->_body.size() == 0)
+        return;
+
     if (this->_header.getTransferEncoding() == "chunked")
     {
         if (this->_body.find("\r\n") == std::string::npos)

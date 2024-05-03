@@ -20,7 +20,6 @@ void checkMethod(const std::string method, int &return_code, std::vector<std::st
 }
 
 Request::Request(const std::string& msg) : _req(msg), _return_code(200), _do_redirect(false) {
-	std::cout << "Request: " << msg << std::endl;
 	try {
 		std::stringstream ss(msg);
 		std::string first_line;
