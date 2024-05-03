@@ -20,6 +20,14 @@ void Request::uploadFile()
 
     std::string path_to_file = this->_path.substr(0, this->_path.find_last_of('/'));
 
+    if (!this->_location.getClientBodyTempPath().empty())
+    {
+        path_to_file = this->_location.getClientBodyTempPath();
+        if (path_to_file[path_to_file.size() - 1] != '/')
+            path_to_file += "/";
+        this->_path = path_to_file + this->_file;
+    }
+
     // Check if the path to the file exists
     if (getResourceType(path_to_file.c_str()) != "directory" || getResourceType(this->_path.c_str()) == "root")
     {

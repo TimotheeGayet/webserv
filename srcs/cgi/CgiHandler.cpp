@@ -21,12 +21,19 @@ std::string CgiHandler::execute_cgi(const std::string& filename) {
         close(pipefd[0]);
         close(pipefd[1]);
 
-        char *args[] = {(char*)"php-cgi", (char*)filename.c_str(), NULL};
+        // char *args[] = {(char*)"php-cgi", (char*)filename.c_str(), NULL};
 
-        if (execve("/usr/bin/php-cgi", args, NULL) == -1) {
+        // if (execve("/usr/bin/php-cgi", args, NULL) == -1) {
+        //     throw std::runtime_error("Execve error");
+        // }
+        // return NULL;
+        char *args[] = {(char*)"ubuntu_cgi_tester", (char*)filename.c_str(), NULL};
+
+        if (execve("/home/mphilip/Documents/42_github/webserv/ubuntu_cgi_tester", args, NULL) == -1) {
             throw std::runtime_error("Execve error");
         }
         return NULL;
+        
     }
     else {
         close(pipefd[1]);

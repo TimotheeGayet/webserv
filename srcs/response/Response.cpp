@@ -88,11 +88,20 @@ std::string Response::Redirect(HeaderRequest& header) {
 	return ss.str();
 }
 
-std::string detectContentType(const std::string& filename) {
+static std::string getExtension(const std::string& filename) {
 	std::string extension;
-	if (filename.find_last_of(".") != std::string::npos)
+	if (filename.find_last_of(".") != std::string::npos) {
 		extension = filename.substr(filename.find_last_of("."));
-	if (extension == ".php") {
+			return extension;
+	}
+	else {
+		return "";
+	}
+}
+
+std::string detectContentType(const std::string& filename) {
+	std::string extension = getExtension(filename);
+	if (extension == ".bla") {
 		return "text/html";
 	} else if (extension == ".html") {
 		return "text/html";
@@ -143,6 +152,11 @@ std::string Response::getResponse()
 			this->_response = generate_listing_html();
 		else
 			return ErrorResponse(404);
+	}
+
+	if (getExtension(this->_request.getPath()) == ".bla")
+	{
+		this->_response = CgiHandler::execute_cgi(this->_request.getPath());
 	}
 
 	if (this->_request.getMethod() == "POST")
