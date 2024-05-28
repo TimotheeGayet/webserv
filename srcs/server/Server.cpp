@@ -67,16 +67,7 @@ SocketInfo Server::initializeSocket(u_int16_t port) {
     return socket_info;
 }
 
-int Server::run() {
-
-    std::map<int, std::string> requests;
-
-    epoll_fd = epoll_create(1);
-    if (epoll_fd == -1) {
-        std::cerr << "error: epoll_create" << std::endl;
-        throw Server::ExitError();
-    }
-
+void Server::listenInit() {
     for (std::vector<u_int16_t>::iterator it = _ports.begin(); it != _ports.end(); ++it) {
         SocketInfo socket_info = initializeSocket(*it);
         sockets.push_back(socket_info);
@@ -91,6 +82,118 @@ int Server::run() {
             throw Server::ExitError();
         }
     }
+}
+
+u_int16_t Server::findPort(int &fd) {
+    for (std::vector<SocketInfo>::iterator it = sockets.begin(); it != sockets.end(); ++it) {
+        if (it->socket_fd == fd) {
+            return it->port;
+        }
+    }
+    return 0;
+}
+
+void Server::newConnection(int fd) {
+    struct sockaddr_in client_address;
+    socklen_t client_address_len = sizeof(client_address);
+    int client_fd = accept(fd, (struct sockaddr *)&client_address, &client_address_len);
+    if (client_fd == -1) {
+        std::cerr << "error: accept" << std::endl;
+        cleanup();
+        throw Server::ExitError();
+    }
+    // Add the client socket to the epoll instance
+    struct epoll_event event;
+    event.events = EPOLLIN; // listen input events
+    event.data.fd = client_fd;
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &event) == -1) {
+        std::cerr << "error: epoll_ctl EPOLL_CTL_ADD" << std::endl;
+        cleanup();
+        throw Server::ExitError();
+    }
+}
+
+void Server::handleDisconnect(int fd, std::map<int, std::string> &requests, int bytes_received) {
+    // no data received -> client disconnected or error
+    if (bytes_received == 0) {
+        std::cout << "Client disconnected" << std::endl << std::endl;
+    } else {
+        std::cerr << "error: recv" << std::endl;
+    }
+    close(fd);
+    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+    requests.erase(fd);
+}
+
+void Server::handleResponse(int fd, std::map<int, std::string> &requests, const std::string& response, Request &req, Response &res) {
+    // Check the connection type
+    if (req.getHeader().getConnection() == "close" || \
+        res.getStatusCode() != 200 || req.getDoRedirect()) {
+        int bytes_sent = send(fd, response.c_str(), response.size(), 0);
+        if (bytes_sent != static_cast<int>(response.size())){
+            std::cerr << "error: send" << std::endl;
+        }
+        close(fd);
+        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+        requests.erase(fd);
+        std::cout << "Connection closed" << std::endl << std::endl;
+    }
+    else if (req.getHeader().getConnection() == "keep-alive") {
+        int bytes_sent = send(fd, response.c_str(), response.size(), 0);
+        if (bytes_sent != static_cast<int>(response.size())){
+            std::cerr << "error: send" << std::endl;
+        }
+        requests.erase(fd);                        
+    }
+        else {
+        std::cerr << "Invalid Connection: " << req.getHeader().getConnection() << std::endl << std::endl;
+        close(fd);
+        requests.erase(fd);
+        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+
+    }
+}
+
+void Server::handleRequest(int fd, std::map<int, std::string> &requests, const std::string& request) {
+    // data received -> append request part and handle the HTTP request if complete
+    requests[fd] = requests[fd] + request;
+
+    if (requests[fd].find("\r\n\r\n") == std::string::npos) {
+        return;
+    }
+
+    Request req(requests[fd]);
+    Response res(req);
+    std::string response = res.getResponse();
+    
+    requests[fd] = "";
+
+    handleResponse(fd, requests, response, req, res);
+}
+
+
+void Server::existingConnection(int fd, std::map<int, std::string> &requests) {
+    char buffer[1024];
+    int bytes_received = recv(fd, buffer, sizeof(buffer), 0);
+    if (bytes_received <= 0) {
+        handleDisconnect(fd, requests, bytes_received);
+    } else {
+        std::string request(buffer, bytes_received);
+        handleRequest(fd, requests, request);
+    }
+}
+
+int Server::run() {
+
+    std::map<int, std::string> requests;
+
+    epoll_fd = epoll_create(1);
+    if (epoll_fd == -1) {
+        std::cerr << "error: epoll_create" << std::endl;
+        throw Server::ExitError();
+    }
+
+    listenInit(); //init epoll and listen on ports
 
     while (true) {
         try {
@@ -110,90 +213,14 @@ int Server::run() {
                 }
 
                 // Find the port associated with the file descriptor
-                u_int16_t port = 0;
-                for (std::vector<SocketInfo>::iterator it = sockets.begin(); it != sockets.end(); ++it) {
-                    if (it->socket_fd == fd) {
-                        port = it->port;
-                        break;
-                    }
-                }
+                u_int16_t port = findPort(fd);
 
                 if (port != 0) {
                     // file descriptor associated with a port -> new client connection
-                    struct sockaddr_in client_address;
-                    socklen_t client_address_len = sizeof(client_address);
-                    int client_fd = accept(fd, (struct sockaddr *)&client_address, &client_address_len);
-                    if (client_fd == -1) {
-                        std::cerr << "error: accept" << std::endl;
-                        cleanup();
-                        throw Server::ExitError();
-                    }
-                    // Add the client socket to the epoll instance
-                    struct epoll_event event;
-                    event.events = EPOLLIN; // listen input events
-                    event.data.fd = client_fd;
-                    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &event) == -1) {
-                        std::cerr << "error: epoll_ctl EPOLL_CTL_ADD" << std::endl;
-                        cleanup();
-                        throw Server::ExitError();
-                    }
+                    newConnection(fd);
                 } else {
                     // file descriptor associated with a client socket -> data received
-                    char buffer[1024];
-                    int bytes_received = recv(fd, buffer, sizeof(buffer), 0);
-                    if (bytes_received <= 0) {
-                        // no data received -> client disconnected or error
-                        
-                        if (bytes_received == 0) {
-                            std::cout << "Client disconnected" << std::endl << std::endl;
-                        } else {
-                            std::cerr << "error: recv" << std::endl;
-                        }
-                        close(fd);
-                        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
-                        requests.erase(fd);
-                    } else {
-                        // data received -> append request part and handle the HTTP request if complete
-                        std::string request(buffer, bytes_received);
-                        requests[fd] = requests[fd] + request;
-
-                        if (requests[fd].find("\r\n\r\n") == std::string::npos) {
-                            continue;
-                        }
-
-                        Request req(requests[fd]);
-                        Response res(req);
-                        std::string response = res.getResponse();
-                        
-                        requests[fd] = "";
-
-                        // Check the connection type
-                        if (req.getHeader().getConnection() == "close" || \
-                            res.getStatusCode() != 200 || req.getDoRedirect()) {
-                            int bytes_sent = send(fd, response.c_str(), response.size(), 0);
-                            if (bytes_sent != static_cast<int>(response.size())){
-                                std::cerr << "error: send" << std::endl;
-                            }
-                            close(fd);
-                            epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
-                            requests.erase(fd);
-                            std::cout << "Connection closed" << std::endl << std::endl;
-                        }
-                        else if (req.getHeader().getConnection() == "keep-alive") {
-                            int bytes_sent = send(fd, response.c_str(), response.size(), 0);
-                            if (bytes_sent != static_cast<int>(response.size())){
-                                std::cerr << "error: send" << std::endl;
-                            }
-                            requests.erase(fd);                        
-                        }
-                         else {
-                            std::cerr << "Invalid Connection: " << req.getHeader().getConnection() << std::endl << std::endl;
-                            close(fd);
-                            requests.erase(fd);
-                            epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
-
-                        }
-                    }
+                    existingConnection(fd, requests);
                 }
             }
         }

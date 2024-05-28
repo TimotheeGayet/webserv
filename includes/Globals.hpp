@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <sys/socket.h>
-#include "./server/Server.hpp"
+#include "server/SocketInfo.hpp"
 #include "./config/GlobalConfig.hpp"
 
 extern size_t                  MAX_BODY_SIZE;
