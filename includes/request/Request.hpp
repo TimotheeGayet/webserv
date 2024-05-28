@@ -44,6 +44,7 @@ class Request
 		bool 					isLocation(const std::string& path);
 		long 					stringToLong(const std::string& str);
 		Location				findLocation(const std::string& path);
+		void					handlePercentEncoding();
 
 		// File utils
 		void 					getFileContent();

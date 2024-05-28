@@ -1,5 +1,24 @@
 #include "../../includes/request/Request.hpp"
 
+void Request::handlePercentEncoding()
+{
+	std::size_t index = 0;
+	std::size_t percent = this->_path.find('%', index);
+	while (percent != std::string::npos)
+	{
+		if (percent + 2 >= this->_path.length() || !isxdigit(this->_path[percent + 1]) || !isxdigit(this->_path[percent + 2]))
+		{
+			this->_return_code = 400;
+			throw std::runtime_error("Invalid percent encoding: " + this->_path);
+		}
+		std::string hex = this->_path.substr(percent + 1, 2);
+		char c = static_cast<char>(std::strtol(hex.c_str(), NULL, 16));
+		this->_path.replace(percent, 3, 1, c);
+		index = percent + 1;
+		percent = this->_path.find('%', index);
+	}
+}
+
 void Request::isValidURI()
 {
 	std::size_t index = 0;
@@ -68,6 +87,8 @@ void Request::isValidURI()
 		this->_return_code = 400;
 		throw std::runtime_error("Invalid path: " + this->_path);
 	}
+
+	handlePercentEncoding();
 
 	this->_req = this->_req.substr(this->_req.find("\r\n") + 2);
 }
