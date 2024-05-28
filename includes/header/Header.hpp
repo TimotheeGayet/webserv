@@ -30,8 +30,8 @@ class HeaderRequest {
 		void 						handleAccept(const std::string& value);
 		void 						handleConnection(const std::string& value);
 		void 						handleContentLength(const std::string& value, int& return_code);
-		void 						handleHost(const std::string& value, ServerConfig& server_config);
 		void 						handleTransferEncoding(const std::string& value, int& return_code);
+		void 						handleHost(const std::string& value, ServerConfig& server_config, u_int16_t port);
 
 		std::vector<AcceptElement>	getAccept() const;
 		std::string					getConnection() const;

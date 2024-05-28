@@ -18,7 +18,7 @@ HeaderRequest Request::headerParsing()
         std::string value = line.substr(line.find(": ") + 2);
 
         if (key == "Host")
-            header.handleHost(value, this->_server_config);
+            header.handleHost(value, this->_server_config, this->_port);
         else if (key == "Accept")
             header.handleAccept(value);
         else if (key == "Connection")

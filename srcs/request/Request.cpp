@@ -19,7 +19,7 @@ void checkMethod(const std::string method, int &return_code, std::vector<std::st
 	throw std::runtime_error("Method Not Allowed by location: " + method);
 }
 
-Request::Request(const std::string& msg) : _req(msg), _return_code(200), _do_redirect(false) {
+Request::Request(const std::string& msg) : _req(msg), _return_code(200), _port(0), _do_redirect(false) {
 	try {
 		std::stringstream ss(msg);
 		std::string first_line;
@@ -48,6 +48,11 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200), _do_red
 		{
 			this->_return_code = 505;
 			throw std::runtime_error("HTTP Version Not Supported: " + first_line);
+		}
+		if (this->_method != "GET" && this->_method != "POST" && this->_method != "DELETE")
+		{
+			this->_return_code = 405;
+			throw std::runtime_error("Method Not Allowed: " + this->_method);
 		}
 
 		isValidURI();

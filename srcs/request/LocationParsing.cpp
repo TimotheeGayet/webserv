@@ -1,22 +1,27 @@
 #include "../../includes/request/Request.hpp"
 
-bool Request::isLocation(const std::string& path) {
+bool Request::isLocation(const std::string& path)
+{
 	std::vector<Location> locations = this->_server_config.getLocations();
 	for (std::vector<Location>::iterator it = locations.begin(); it != locations.end(); it++)
 	{
-		if (it->getPath() == path){
+		if (it->getPath() == path)
+		{
 			return true;
 		}
 	}
 	return false;
 }
 
-Location Request::findLocation(const std::string& path) {
+Location Request::findLocation(const std::string& path)
+{
 	std::vector<Location> locations = this->_server_config.getLocations();
 	for (std::vector<Location>::iterator it = locations.begin(); it != locations.end(); it++)
 	{
 		if (it->getPath() == path)
+		{
 			return *it;
+		}
 	}
 	return Location();
 }
@@ -56,7 +61,8 @@ void Request::resolvePath()
     {
         _return_code = 404;
 
-		if (_location.getRedirectUrl().empty() == false) {
+		if (_location.getRedirectUrl().empty() == false)
+		{
 			_do_redirect = true;
 		}
     	throw std::runtime_error("Resource not found: " + _path);
@@ -68,7 +74,8 @@ void Request::locationParsing()
 	std::string asked_path = this->_path;
 	std::string location = this->_path;
 
-	while (isLocation(location) == false) {
+	while (isLocation(location) == false)
+	{
 		location = location.substr(0, location.find_last_of('/'));
 		if (location.empty())
 			location = "/";
@@ -76,7 +83,9 @@ void Request::locationParsing()
 			break;
 	}
 
-	if (isLocation(location) == false) {
+
+	if (isLocation(location) == false)
+	{
 		this->_return_code = 404;
 		throw std::runtime_error("Resource not found: " + this->_path);
 	};
@@ -84,21 +93,30 @@ void Request::locationParsing()
 	this->_location = findLocation(location);
 
 	if (asked_path == this->_location.getPath() && \
-		this->_location.getRedirectUrl().empty() == false) {
+		this->_location.getRedirectUrl().empty() == false)
+	{
 		this->_do_redirect = true;
 	}
 
-	if (location == this->_path) {
-		if (this->_location.getRoot().empty()) {
+	if (location == this->_path)
+	{
+		if (this->_location.getRoot().empty())
+		{
 			this->_path = this->_server_config.getRoot();
-		} else {
+		}
+		else
+		{
 			this->_path = this->_location.getRoot();
 		}
 	}
-	else {
-		if (this->_location.getRoot().empty()) {
+	else
+	{
+		if (this->_location.getRoot().empty())
+		{
 			this->_path = this->_server_config.getRoot() + "/" + this->_path.substr(location.size());
-		} else {
+		}
+		else
+		{
 			this->_path = this->_location.getRoot() + "/" + this->_path.substr(location.size());
 		}
 	}
@@ -109,4 +127,6 @@ void Request::locationParsing()
 	}
 
 	resolvePath();
+
+	std::cout << "Path: " << _path << std::endl;
 }
