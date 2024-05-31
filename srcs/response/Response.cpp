@@ -154,18 +154,18 @@ std::string Response::getResponse()
 			return ErrorResponse(404);
 	}
 
-	if (getExtension(this->_request.getPath()) == ".php")
-	{
-		this->_response = CgiHandler::execute_cgi(this->_request.getPath());
-	}
-
-	if (this->_request.getMethod() == "POST")
+	if (this->_request.getMethod() == "POST" || this->_request.getMethod() == "PUT")
 	{
 		code = "201 Created";
 	}
 	else if (this->_request.getMethod() == "DELETE")
 	{
 		code = "204 No Content";
+	}
+	else if (getExtension(this->_request.getPath()) == ".php" && (this->_request.getMethod() == "GET" || this->_request.getMethod() == "POST")) // Rajouter un check de l'extension puisqu'elle peut etre redefinie
+	{
+		code = "200 OK";
+		this->_response = CgiHandler::execute_cgi(this->_request.getPath());
 	}
 
 	std::stringstream ss;

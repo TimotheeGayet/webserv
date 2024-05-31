@@ -47,7 +47,7 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200), _port(0
 			this->_return_code = 505;
 			throw std::runtime_error("HTTP Version Not Supported: " + first_line);
 		}
-		if (this->_method != "GET" && this->_method != "POST" && this->_method != "DELETE")
+		if (this->_method != "GET" && this->_method != "POST" && this->_method != "DELETE" && this->_method != "PUT")
 		{
 			this->_return_code = 405;
 			throw std::runtime_error("Method Not Allowed: " + this->_method);
@@ -61,14 +61,14 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200), _port(0
 
 		if (this->_method == "GET")
 			getFileContent();
-		else if (this->_method == "POST")
+		else if (this->_method == "POST" || this->_method == "PUT")
 			uploadFile();
 		else if (this->_method == "DELETE")
 			deleteFile();
 	}
 	catch (std::exception &e)
 	{
-		std::cerr << "webserv: Error: " << e.what() << std::endl;
+		std::cerr << "[ERROR]: webserv: " << e.what() << std::endl;
 	}
 }
 

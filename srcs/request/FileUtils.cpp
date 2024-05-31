@@ -2,78 +2,83 @@
 
 void Request::getFileContent()
 {
-	std::ifstream file(this->_path.c_str());
+	std::ifstream file(_path.c_str());
     std::string line;
     while (std::getline(file, line))
     {
-        this->_response += line + "\n";
+        _response += line + "\n";
     }
 }
 
 void Request::uploadFile()
 {
-    if (this->_ressource_type == "directory")
+    if (_ressource_type == "directory")
     {
-        this->_return_code = 400;
-        throw std::runtime_error("Bad Request: cannot upload file to a directory");
+        _return_code = 400;
+        throw std::runtime_error("Bad Request: cannot upload a directory");
     }
 
-    std::string path_to_file = this->_path.substr(0, this->_path.find_last_of('/'));
+    std::string path_to_file = _path.substr(0, _path.find_last_of('/'));
 
-    if (!this->_location.getClientBodyTempPath().empty())
+    if (!_location.getClientBodyTempPath().empty())
     {
-        path_to_file = this->_location.getClientBodyTempPath();
+        path_to_file = _location.getClientBodyTempPath();
         if (path_to_file[path_to_file.size() - 1] != '/')
             path_to_file += "/";
-        this->_path = path_to_file + this->_file;
+        _path = path_to_file + _file;
     }
 
     // Check if the path to the file exists
-    if (getResourceType(path_to_file.c_str()) != "directory" || getResourceType(this->_path.c_str()) == "root")
+    if (_ressource_type != "directory" || _ressource_type == "root")
     {
-        this->_return_code = 404;
-        throw std::runtime_error("Invalid path for file uploading: " + this->_path);
+        _return_code = 404;
+        throw std::runtime_error("Invalid path for file uploading: " + _path);
     }
 
     // Create the file first if it doesn't exists
-    if (getResourceType(this->_path.c_str()) == "unknown")
+    if (_ressource_type == "unknown")
     {
-        std::ofstream new_file(this->_path.c_str(), std::ofstream::out);
+        std::ofstream new_file(_path.c_str(), std::ofstream::out);
         new_file.close();
     }
 
+    // // Send to cgi if needed
+    // if (_location.getCgiPath() != "" && _method == "POST")
+    // {
+    //     // Call the cgi
+    //     // _body = cgiHandler.execute_cgi(_path);
+    // }
+
     std::ofstream file;
-    file.open(this->_path.c_str(), std::ifstream::app);
+    file.open(_path.c_str(), std::ifstream::app);
 
     if (!file.is_open())
     {
-        this->_return_code = 500;
+        _return_code = 500;
         throw std::runtime_error("Internal Server Error: cannot open file for writing");
     }
 
-    file << this->_body;
+    file << _body;
     file.close();
-
-    this->_file = this->_path.substr(this->_path.find_last_of('/') + 1);
 }
 
 void Request::deleteFile()
 {
-    if (this->_ressource_type == "directory" || this->_ressource_type == "root")
+    if (_ressource_type == "directory" || _ressource_type == "root")
     {
-        this->_return_code = 400;
+        _return_code = 400;
         throw std::runtime_error("Bad Request: cannot delete a directory");
     }
 
-    if (getResourceType(this->_path.c_str()) == "unknown")
+    if (_ressource_type == "unknown")
     {
-        this->_return_code = 404;
-        throw std::runtime_error("Not Found: " + this->_path);
+        _return_code = 404;
+        throw std::runtime_error("Not Found: " + _path);
     }
 
-    if (std::remove(this->_path.c_str()) != 0)
+    if (std::remove(_path.c_str()) != 0)
     {
-        this->_return_code = 500;
+        _return_code = 500;
         throw std::runtime_error("Internal Server Error: cannot delete file");
     }
 }

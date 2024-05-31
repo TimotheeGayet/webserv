@@ -12,3 +12,6 @@ YoupiBanane
 ubuntu_tester
 ubuntu_cgi_tester
 tester.py
+
+# config files
+config_files/webserv.conf

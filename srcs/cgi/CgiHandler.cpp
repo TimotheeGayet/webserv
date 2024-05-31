@@ -26,7 +26,7 @@ std::string CgiHandler::execute_cgi(const std::string& filename) {
 
         char *args[] = {(char*)"php-cgi", (char*)filename.c_str(), NULL};
 
-        if (execve("/usr/bin/php-cgi", args, NULL) == -1) {
+        if (execve("./ubuntu_cgi_tester", args, NULL) == -1) {
             throw std::runtime_error("Execve error");
         }
         return NULL;
