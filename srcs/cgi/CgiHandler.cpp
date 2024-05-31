@@ -46,7 +46,7 @@ std::string CgiHandler::execute_cgi(const std::string& filename) {
         close(pipefd[0]);
 
         if (WIFEXITED(status)) {
-            std::cout << "Child process end with code : " << WEXITSTATUS(status) << std::endl;
+            std::cout << "[LOGS]: Child process end with code : " << WEXITSTATUS(status) << std::endl;
         }
 
         return result_stream.str();

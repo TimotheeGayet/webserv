@@ -61,7 +61,7 @@ SocketInfo Server::initializeSocket(u_int16_t port) {
         throw Server::ExitError();
     }
 
-    std::cout << "Server listening on port " << port << std::endl;
+    std::cout << "[LOGS]: Server listening on port " << port << std::endl;
 
     SocketInfo socket_info = {server_fd, port};
     return socket_info;
@@ -116,9 +116,9 @@ void Server::newConnection(int fd) {
 void Server::handleDisconnect(int fd, std::map<int, std::string> &requests, int bytes_received) {
     // no data received -> client disconnected or error
     if (bytes_received == 0) {
-        std::cout << "Client disconnected" << std::endl << std::endl;
+        std::cout << "[LOGS]: Client disconnected" << std::endl << std::endl;
     } else {
-        std::cerr << "error: recv" << std::endl;
+        std::cerr << "[LOGS]: error: recv" << std::endl;
     }
     close(fd);
     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
@@ -136,7 +136,7 @@ void Server::handleResponse(int fd, std::map<int, std::string> &requests, const 
         close(fd);
         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
         requests.erase(fd);
-        std::cout << "Connection closed" << std::endl << std::endl;
+        std::cout << "[LOGS]: Connection closed" << std::endl << std::endl;
     }
     else if (req.getHeader().getConnection() == "keep-alive") {
         int bytes_sent = send(fd, response.c_str(), response.size(), 0);

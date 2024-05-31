@@ -25,7 +25,6 @@ static std::string create_link(std::string path_dir, const std::string &name, bo
 std::string Response::generate_listing_html() {
 
     std::string new_path = this->_request.getInitialPath();
-    std::cout << "new_path: " << new_path << std::endl;
     std::string html = "<html><body><h1>Listing : ";
     html += new_path;
     html += "</h1><ul>";
