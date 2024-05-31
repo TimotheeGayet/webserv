@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 
-std::string CgiHandler::execute_cgi(const std::string& filename) {
+std::string CgiHandler::execute_cgi(const std::string& filename, const std::string& cgi_path) {
 
     int pipefd[2];
     if (pipe(pipefd) == -1) {
@@ -23,10 +23,19 @@ std::string CgiHandler::execute_cgi(const std::string& filename) {
         dup2(pipefd[1], STDOUT_FILENO);
         close(pipefd[0]);
         close(pipefd[1]);
+        std::string executable;
 
-        char *args[] = {(char*)"php-cgi", (char*)filename.c_str(), NULL};
+        size_t pos = filename.find_last_of('/');
+        if (pos != std::string::npos) {
+            executable = filename.substr(pos + 1);
+        }
+        else {
+            throw std::runtime_error("Filename error");
+        }
 
-        if (execve("./ubuntu_cgi_tester", args, NULL) == -1) {
+        char *args[] = {(char*)executable.c_str(), (char*)filename.c_str(), NULL};
+
+        if (execve(cgi_path.c_str(), args, NULL) == -1) {
             throw std::runtime_error("Execve error");
         }
         return NULL;

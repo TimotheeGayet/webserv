@@ -20,6 +20,8 @@ class Location {
         void                        setIndex(const std::string value);
         void                        setAutoindex(const std::string value);
         void                        setRedirectUrl(const std::string value);
+        void                        setCgiPath(const std::string value);
+        void                        setIndexExtension(const std::string value);
         void                        setAllowedMethods(const std::string value);
         void                        setClientMaxBodySize(const std::string value);
         void                        setClientBodyTempPath(const std::string value);
@@ -31,7 +33,9 @@ class Location {
         std::string                 getPath() const;
         std::string                 getRoot() const;
         std::string                 getIndex() const;
+        std::string                 getCgiPath() const;
         std::string                 getRedirectUrl() const;
+        std::string                 getIndexExtension() const;
         std::string                 getClientMaxBodySize() const;
         std::string                 getClientBodyTempPath() const;
         std::map<int, std::string>  getErrorPages() const;
@@ -42,10 +46,12 @@ class Location {
         std::string                 _path;                  // name of the route
         std::string                 _root;                  // path of the folder to route
         std::string                 _index;                 // default file to return
+        std::string                 _cgi_path;              // path of the cgi
         std::string                 _redirect_url;          // redirection
+        std::string                 _index_extension;       // extension of the index file
         std::string                 _client_body_temp_path; // path of the client upload's folder
         std::string                 _client_max_body_size;  // body size limitaion
-        std::vector<std::string>    _allowed_methods;       // allowed methods (GET, POST and/or DELETE)
+        std::vector<std::string>    _allowed_methods;       // allowed methods (GET, POST, PUT and/or DELETE)
         std::map<int, std::string>  _error_pages;           // map of error pages with their codes
 };
 
