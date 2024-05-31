@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 
-std::string CgiHandler::execute_cgi(const std::string& filename) {
+std::string CgiHandler::execute_cgi(const std::string& filename, const std::string& cgi_path) {
 
     int pipefd[2];
     if (pipe(pipefd) == -1) {
@@ -26,7 +26,7 @@ std::string CgiHandler::execute_cgi(const std::string& filename) {
 
         char *args[] = {(char*)"php-cgi", (char*)filename.c_str(), NULL};
 
-        if (execve("/usr/bin/php-cgi", args, NULL) == -1) {
+        if (execve(cgi_path.c_str(), args, NULL) == -1) {
             throw std::runtime_error("Execve error");
         }
         return NULL;

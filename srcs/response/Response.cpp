@@ -99,9 +99,9 @@ static std::string getExtension(const std::string& filename) {
 	}
 }
 
-std::string detectContentType(const std::string& filename) {
+std::string detectContentType(const std::string& filename, const std::string index_extension) {
 	std::string extension = getExtension(filename);
-	if (extension == ".php") {
+	if (extension == index_extension) {
 		return "text/html";
 	} else if (extension == ".html") {
 		return "text/html";
@@ -124,7 +124,7 @@ std::string Response::getResponse()
 {
 	HeaderRequest header = this->_request.getHeader();
 	std::string path = this->_request.getServerConfig().getRoot() + this->_request.getPath();
-	std::string contentType = detectContentType(this->_request.getPath());
+	std::string contentType = detectContentType(this->_request.getPath(), this->_request.getLocation().getIndexExtension());
 	std::string code = "200 OK";
 	std::vector<AcceptElement> accept = header.getAccept();
 
@@ -154,9 +154,12 @@ std::string Response::getResponse()
 			return ErrorResponse(404);
 	}
 
-	if (getExtension(this->_request.getPath()) == ".php")
+	if (getExtension(this->_request.getPath()) == this->_request.getLocation().getIndexExtension())
 	{
-		this->_response = CgiHandler::execute_cgi(this->_request.getPath());
+		this->_response = this->_request.getLocation().getIndex();
+	}
+	{
+		this->_response = CgiHandler::execute_cgi(this->_request.getPath(), this->_request.getLocation().getCgiPath());
 	}
 
 	if (this->_request.getMethod() == "POST")

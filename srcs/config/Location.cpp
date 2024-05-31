@@ -58,7 +58,9 @@ Location::Location()
       _path(""), 
       _root(""), 
       _index(""), 
-      _redirect_url(""), 
+      _cgi_path(""),
+      _redirect_url(""),
+      _index_extension(""), 
       _client_body_temp_path(""), 
       _client_max_body_size("0"), 
       _allowed_methods(std::vector<std::string>()), 
@@ -92,6 +94,9 @@ void    Location::setLocationParam(const std::string key, const std::string valu
     else if (key == "redirect_url") {
         this->setRedirectUrl(value);
     }
+    else if (key == "cgi_path") {
+        this->setCgiPath(value);
+    }
     else if (key == "client_body_temp_path") {
         this->setClientBodyTempPath(value);
     }
@@ -110,7 +115,7 @@ void    Location::setLocationParam(const std::string key, const std::string valu
         }
     }
     else {
-        throw std::runtime_error("Unknown key in location : " + key + ". Keys allowed are 'autoindex', 'path', 'root', 'index', 'redirect_url', 'client_body_temp_path', 'client_max_body_size', 'allowed_methods' and 'error_pages'.");
+        throw std::runtime_error("Unknown key in location : " + key + ". Keys allowed are 'autoindex', 'path', 'root', 'index', 'redirect_url', 'client_body_temp_path', 'client_max_body_size', 'allowed_methods', 'cgi_path' and 'error_pages'.");
     }
 }
 
@@ -132,8 +137,22 @@ void Location::setRoot(const std::string value) {
     _root = value;
 }
 
+void Location::setIndexExtension(const std::string value) {
+    _index_extension = value;
+}
+
 void Location::setIndex(const std::string value) {
+    std::string extension;
+    size_t pos = value.find_last_of('.');
+    if (pos != std::string::npos) {
+        extension = value.substr(pos);
+        setIndexExtension(extension);
+    }
     _index = value;
+}
+
+void Location::setCgiPath(const std::string value) {
+    _cgi_path = value;
 }
 
 void Location::setRedirectUrl(const std::string value) {
@@ -152,11 +171,11 @@ void Location::setAllowedMethods(const std::string value) {
     std::istringstream iss(value);
     std::string method;
     while (iss >> method) {
-        if (method == "POST" || method == "GET" || method == "DELETE") {
+        if (method == "POST" || method == "GET" || method == "DELETE" || method == "PUT") {
             _allowed_methods.push_back(method);
         }
         else {
-            throw std::invalid_argument("Error: '" + method + "' is not an allowed method (GET, POST, DELETE).");
+            throw std::invalid_argument("Error: '" + method + "' is not an allowed method (GET, POST, PUT, DELETE).");
         }
     }
 }
@@ -188,6 +207,14 @@ std::string Location::getRoot() const {
 
 std::string Location::getIndex() const {
     return _index;
+}
+
+std::string Location::getIndexExtension() const {
+    return _index_extension;
+}
+
+std::string Location::getCgiPath() const {
+    return _cgi_path;
 }
 
 std::string Location::getRedirectUrl() const {
