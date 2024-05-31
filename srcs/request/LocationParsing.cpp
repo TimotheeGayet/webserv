@@ -127,6 +127,4 @@ void Request::locationParsing()
 	}
 
 	resolvePath();
-
-	std::cout << "Path: " << _path << std::endl;
 }

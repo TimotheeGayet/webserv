@@ -141,7 +141,7 @@ std::string Response::getResponse()
 	} 
 
 	std::ifstream file(path.c_str());
-	if (!file.is_open())
+	if (!file.is_open() && this->_request.getMethod() != "DELETE")
 	{
 		if (this->_request.getLocation().getRedirectUrl().empty() == false)
 		{

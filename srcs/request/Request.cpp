@@ -2,14 +2,11 @@
 #include "../../includes/Globals.hpp"
 #include <string>
 
-void checkMethod(const std::string method, int &return_code, std::vector<std::string> allowed_methods) {
-	if (method != "GET" && method != "POST" && method != "DELETE")
-	{
-		return_code = 405;
-		throw std::runtime_error("Method Not Allowed: " + method);
-	}
+void checkMethod(const std::string method, int &return_code, std::vector<std::string> allowed_methods)
+{
 	if (allowed_methods.empty())
 		return;
+
 	for (std::vector<std::string>::iterator it = allowed_methods.begin(); it != allowed_methods.end(); it++)
 	{
 		if (*it == method)
@@ -20,7 +17,8 @@ void checkMethod(const std::string method, int &return_code, std::vector<std::st
 }
 
 Request::Request(const std::string& msg) : _req(msg), _return_code(200), _port(0), _do_redirect(false) {
-	try {
+	try
+	{
 		std::stringstream ss(msg);
 		std::string first_line;
 		std::getline(ss, first_line);
