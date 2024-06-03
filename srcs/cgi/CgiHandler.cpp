@@ -4,53 +4,7 @@
 #include <string>
 #include <map>
 
-char ** CgiHandler::makeEnv(ServerConfig server, Location location, Request &request) {
-    std::map<std::string, std::string> env_map;
-    HeaderRequest headers = request.getHeader();
-
-    env_map["REDIRECT_STATUS"] = "200";
-    env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
-    env_map["SCRIPT_NAME"] = location.getPath();
-    env_map["SCRIPT_FILENAME"] = location.getPath();
-    env_map["REQUEST_METHOD"] = request.getMethod();
-    env_map["CONTENT_LENGTH"] = headers.getContentLength();
-    env_map["CONTENT_TYPE"] = "text/html";
-    env_map["PATH_INFO"] = request.getPath();
-    env_map["PATH_TRANSLATED"] = request.getPath();
-    env_map["QUERY_STRING"] = request.getRequest();
-    env_map["REQUEST_URI"] = request.getURI();
-    env_map["SERVER_NAME"] = server.getServerName();
-
-    uint16_t port = server.getPort();
-    std::ostringstream oss;
-    oss << port;
-    std::string port_str = oss.str();
-    env_map["SERVER_PORT"] = port_str;
-    
-    env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
-    env_map["SERVER_SOFTWARE"] = "serveur_du_web";
-
-    char **env = new char*[env_map.size() + 1];
-    int i = 0;
-    for (std::map<std::string, std::string>::const_iterator it = env_map.begin(); it != env_map.end(); ++it) {
-        std::string str = it->first + "=" + it->second;
-        env[i] = new char[str.size() + 1];
-        std::strcpy(env[i], str.c_str());
-        i++;
-    }
-    env[i] = NULL;
-    return env;
-}
-
-static void freeEnv(char **env) {
-    for (int i = 0; env[i]; i++) {
-        delete[] env[i];
-    }
-    delete[] env;
-}
-
-
-std::string CgiHandler::execute_cgi(const std::string& filename, const std::string& cgi_path, ServerConfig server, Location location, Request &request) {
+std::string CgiHandler::execute_cgi(const std::string& filename, const std::string& cgi_path) {
 
     int pipefd[2];
     if (pipe(pipefd) == -1) {
@@ -81,14 +35,9 @@ std::string CgiHandler::execute_cgi(const std::string& filename, const std::stri
 
         char *args[] = {(char*)executable.c_str(), (char*)filename.c_str(), NULL};
 
-        char **env;
-        env = makeEnv(server, location, request);
-
-        if (execve(cgi_path.c_str(), args, env) == -1) {
-            freeEnv(env);
+        if (execve(cgi_path.c_str(), args, NULL) == -1) {
             throw std::runtime_error("Execve error");
         }
-        freeEnv(env);
         return NULL;
     }
     else {

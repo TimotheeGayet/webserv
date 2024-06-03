@@ -65,6 +65,8 @@ Request::Request(const std::string& msg) : _req(msg), _return_code(200), _port(0
 			uploadFile();
 		else if (this->_method == "DELETE")
 			deleteFile();
+
+		_req = msg;
 	}
 	catch (std::exception &e)
 	{

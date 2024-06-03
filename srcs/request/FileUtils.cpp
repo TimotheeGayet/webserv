@@ -29,7 +29,7 @@ void Request::uploadFile()
     }
 
     // Check if the path to the file exists
-    if (_ressource_type != "directory" || _ressource_type == "root")
+    if (_ressource_type == "directory" || _ressource_type == "root")
     {
         _return_code = 404;
         throw std::runtime_error("Invalid path for file uploading: " + _path);
@@ -41,13 +41,6 @@ void Request::uploadFile()
         std::ofstream new_file(_path.c_str(), std::ofstream::out);
         new_file.close();
     }
-
-    // // Send to cgi if needed
-    // if (_location.getCgiPath() != "" && _method == "POST")
-    // {
-    //     // Call the cgi
-    //     // _body = cgiHandler.execute_cgi(_path);
-    // }
 
     std::ofstream file;
     file.open(_path.c_str(), std::ifstream::app);

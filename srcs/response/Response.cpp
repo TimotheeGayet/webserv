@@ -95,7 +95,7 @@ static std::string getExtension(const std::string& filename) {
 			return extension;
 	}
 	else {
-		return "";
+		return ".html";
 	}
 }
 
@@ -162,10 +162,10 @@ std::string Response::getResponse()
 	{
 		code = "204 No Content";
 	}
-	else if (getExtension(this->_request.getPath()) == this->_request.getLocation().getIndexExtension() && (this->_request.getMethod() == "GET" || this->_request.getMethod() == "POST")) // Rajouter un check de l'extension puisqu'elle peut etre redefinie
+	else if (getExtension(this->_request.getPath()) == this->_request.getLocation().getIndexExtension() && (this->_request.getMethod() == "GET"))
 	{
 		code = "200 OK";
-		this->_response = CgiHandler::execute_cgi(this->_request.getPath(), this->_request.getLocation().getCgiPath(), this->_request.getServerConfig(), this->_request.getLocation(), this->_request);
+		this->_response = CgiHandler::execute_cgi(this->_request.getPath(), this->_request.getLocation().getCgiPath());
 	}
 
 	std::stringstream ss;

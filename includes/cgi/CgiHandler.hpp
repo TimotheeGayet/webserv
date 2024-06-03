@@ -18,7 +18,5 @@
 
 class CgiHandler {
     public:
-        static std::string execute_cgi(const std::string& filename, const std::string& cgi_path, ServerConfig server, Location location, Request &request);
-    private:
-        static char **makeEnv(ServerConfig server, Location location, Request &request);
+        static std::string execute_cgi(const std::string& filename, const std::string& cgi_path);
 };

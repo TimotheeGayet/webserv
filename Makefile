@@ -4,7 +4,7 @@ HEADER := ./includes
 
 CPP := c++
 
-FLAGS := -Wall -Wextra -Werror -std=c++98 -g3
+FLAGS := -Wall -Wextra -Werror -std=c++98 -g3 -MD
 
 OBJDIR := build/
 
@@ -63,3 +63,5 @@ fclean: clean
 re: fclean all
 
 .PHONY: all clean fclean
+
+-include $(OBJS:.o=.d)
