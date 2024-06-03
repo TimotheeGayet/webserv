@@ -82,6 +82,14 @@ bool Request::getDoRedirect() const {
 	return this->_do_redirect;
 }
 
+std::string Request::getRequest() {
+	return this->_req;
+}
+
+std::string Request::getURI() const {
+	return this->_uri;
+}
+
 void Request::setDoRedirect(bool do_redirect) {
 	this->_do_redirect = do_redirect;
 }

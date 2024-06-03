@@ -165,7 +165,7 @@ std::string Response::getResponse()
 	else if (getExtension(this->_request.getPath()) == this->_request.getLocation().getIndexExtension() && (this->_request.getMethod() == "GET" || this->_request.getMethod() == "POST")) // Rajouter un check de l'extension puisqu'elle peut etre redefinie
 	{
 		code = "200 OK";
-		this->_response = CgiHandler::execute_cgi(this->_request.getPath(), this->_request.getLocation().getCgiPath());
+		this->_response = CgiHandler::execute_cgi(this->_request.getPath(), this->_request.getLocation().getCgiPath(), this->_request.getServerConfig(), this->_request.getLocation(), this->_request);
 	}
 
 	std::stringstream ss;

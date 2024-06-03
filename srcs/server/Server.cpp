@@ -165,7 +165,7 @@ void Server::handleRequest(int fd, std::map<int, std::string> &requests, const s
     Request req(requests[fd]);
     Response res(req);
     std::string response = res.getResponse();
-    
+
     requests[fd] = "";
 
     handleResponse(fd, requests, response, req, res);

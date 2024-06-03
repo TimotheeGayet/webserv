@@ -66,6 +66,8 @@ class Request
 		bool 					getDoRedirect() const;
 		std::string 			getInitialPath() const;
 		std::string 			getResponse() const;
+		std::string 			getURI() const;
+		std::string 			getRequest();
 
 };
 
